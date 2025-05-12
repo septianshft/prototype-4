@@ -60,7 +60,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             type="text"
             required
             autofocus
-            autocomplete="name"
+            autocomplete=" name"
             :placeholder="__('Full name')"
         />
 
