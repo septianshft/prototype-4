@@ -41,7 +41,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         Session::regenerate();
 
         // Redirect based on role
-        $user = Auth::user();
+        $user = Auth::user();   
         if ($user->role === 'admin') {
             // Assuming admin dashboard route is named 'admin.dashboard'
             // Make sure to define this route in routes/web.php

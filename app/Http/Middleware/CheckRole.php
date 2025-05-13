@@ -23,19 +23,23 @@ class CheckRole
 
         $user = Auth::user();
 
+        // CheckRole.php
         if ($user->role !== $role) {
-            // Redirect based on their actual role if they try to access the wrong dashboard
-            if ($user->role === 'admin') {
-                return redirect('/admin/dashboard');
-            } elseif ($user->role === 'talent') {
-                return redirect('/talent/dashboard'); // Assuming '/talent/dashboard' is the talent dashboard
-            } elseif ($user->role === 'user') {
-                return redirect('/dashboard'); // Assuming '/dashboard' is the user dashboard
+            switch ($user->role) {
+                case 'admin':
+                    return redirect('/admin/dashboard');
+                case 'dosen':
+                    return redirect('/dosen/dashboard');
+                case 'mahasiswa':
+                    return redirect('/dashboard');
+                case 'direktur':
+                    return redirect('/direktur/dashboard');
+                default:
+                    Auth::logout();
+                    return redirect('login')->with('error', 'Unauthorized access.');
             }
-            // Fallback if role is somehow unexpected (shouldn't happen with enum)
-            Auth::logout();
-            return redirect('login')->with('error', 'Unauthorized access.');
         }
+
 
         return $next($request);
     }
