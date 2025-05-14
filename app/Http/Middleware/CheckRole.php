@@ -29,11 +29,11 @@ class CheckRole
                 case 'admin':
                     return redirect('/admin/dashboard');
                 case 'dosen':
-                    return redirect('/dosen/dashboard');
+                    return redirect('/dashboard');
                 case 'mahasiswa':
                     return redirect('/dashboard');
                 case 'direktur':
-                    return redirect('/direktur/dashboard');
+                    return redirect('/dashboard');
                 default:
                     Auth::logout();
                     return redirect('login')->with('error', 'Unauthorized access.');

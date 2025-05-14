@@ -38,7 +38,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data ditemukan.</td>
+                            <td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data ditemukan.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -63,23 +64,33 @@
                             <label class="block text-sm font-medium text-gray-700">Nama</label>
                             <input type="text" wire:model="name"
                                 class="w-full border px-3 py-2 rounded shadow-sm focus:outline-none focus:ring focus:border-blue-400  dark:text-black"" />
-                            @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            @error('name')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Email</label>
                             <input type="email" wire:model="email"
                                 class="w-full border px-3 py-2 rounded shadow-sm focus:outline-none focus:ring focus:border-blue-400  dark:text-black"" />
-                            @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            @error('email')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Role</label>
-                            <input type="text" wire:model="role" placeholder="mahasiswa/dosen/vicedirector"
-                                class="w-full border px-3 py-2 rounded shadow-sm focus:outline-none focus:ring focus:border-blue-400  dark:text-black"" />
-                            @error('role') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            <select wire:model="role"
+                                class="w-full border px-3 py-2 rounded shadow-sm focus:outline-none focus:ring focus:border-blue-400 dark:text-black">
+                                <option value="">-- Pilih Role --</option>
+                                <option value="mahasiswa">Mahasiswa</option>
+                                <option value="dosen">Dosen</option>
+                                <option value="vicedirector">Vice Director</option>
+                            </select>
+                            @error('role')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
-
                         <div class="text-right">
                             <button type="button" wire:click="closeModal"
                                 class="bg-gray-300 px-4 py-2 rounded shadow mr-2 hover:bg-gray-400">Batal</button>

@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('laporan_beasiswa', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('nama_laporan');
             $table->string('file_path');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('data_mahasiswa_id')->constrained('data_mahasiswa')->onDelete('cascade');
             $table->timestamps();
         });
     }

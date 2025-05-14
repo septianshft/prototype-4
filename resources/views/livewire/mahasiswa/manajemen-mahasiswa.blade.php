@@ -31,8 +31,8 @@
                          <td class="px-4 py-2">{{ $data->nama_mahasiswa }}</td>
                          <td class="px-4 py-2">{{ $data->nim }}</td>
                          <td class="px-4 py-2">{{ $data->ipk }}</td>
-                         <td class="px-4 py-2">{{ $data->email }}</td>
-                         <td class="px-4 py-2">{{ $data->role }}</td>
+                         <td class="px-4 py-2">{{ $data->user->email ?? '-' }}</td>
+                         <td class="px-4 py-2">{{ $data->user->role ?? '-' }}</td>
                          <td class="px-4 py-2">{{ $data->program_studi }}</td>
                          <td class="px-4 py-2 space-x-2">
                              <button wire:click="edit({{ $data->id }})"
@@ -57,33 +57,38 @@
                          <div>
                              <label class="block text-sm text-gray-700">Nama</label>
                              <input type="text " wire:model="nama_mahasiswa"
-                                 class="w-full border px-3 py-2 rounded dark:bg-gray-600 dark:text-black" />
+                                 class="w-full border px-3 py-2 rounded  dark:text-black" />
                          </div>
                          <div>
                              <label class="block text-sm text-gray-700">NIM</label>
                              <input type="text" wire:model="nim"
-                                 class="w-full border px-3 py-2 rounded dark:bg-gray-600 dark:text-black" />
+                                 class="w-full border px-3 py-2 rounded  dark:text-black" />
                          </div>
                          <div>
                              <label class="block text-sm text-gray-700">IPK</label>
                              <input type="number" step="0.01" wire:model="ipk"
-                                 class="w-full border px-3 py-2 rounded dark:bg-gray-600 dark:text-black" />
+                                 class="w-full border px-3 py-2 rounded  dark:text-black" />
                          </div>
-                         <div>
-                             <label class="block text-sm text-gray-700">Email</label>
-                             <input type="email" wire:model="email"
-                                 class="w-full border px-3 py-2 rounded dark:bg-gray-600 dark:text-black" />
-                         </div>
-                         <div>
-                             <label class="block text-sm text-gray-700">Role</label>
-                             <input type="text" wire:model="role"
-                                 class="w-full border px-3 py-2 rounded dark:bg-gray-600 dark:text-black" />
-                         </div>
+                         @if ($isEdit)
+                             <div>
+                                 <label class="block text-sm text-gray-700">Email</label>
+                                 <input type="email" wire:model="email" readonly
+                                     class="w-full border px-3 py-2 rounded bg-gray-100  dark:text-black" />
+                             </div>
+                             <div>
+                                 <label class="block text-sm text-gray-700">Role</label>
+                                 <input type="text" wire:model="role" readonly
+                                     class="w-full border px-3 py-2 rounded bg-gray-100 dark:text-black" />
+                             </div>
+                         @endif
+
                          <div>
                              <label class="block text-sm text-gray-700">Program Studi</label>
                              <input type="text" wire:model="program_studi"
                                  class="w-full border px-3 py-2 rounded dark:text-black" />
                          </div>
+
+
                          <div class="text-right">
                              <button type="button" wire:click="closeModal"
                                  class="bg-gray-300 px-4 py-2 rounded mr-2">Batal</button>

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Data_Mahasiswa;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
@@ -11,16 +12,9 @@ class UserManager extends Component
 {
     use WithPagination;
 
-    public $user_id, $name, $email, $role;
-    public $search = '';
+    public $user_id, $name, $email, $role, $search = '';
     public $isEdit = false;
     public $showModal = false;
-
-    protected $rules = [
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'role' => 'required|string|max:50',
-    ];
 
     public function render()
     {
@@ -29,6 +23,15 @@ class UserManager extends Component
             ->paginate(10);
 
         return view('livewire.admin.user-manager', compact('users'));
+    }
+
+    public function rules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $this->user_id,
+            'role' => 'required|string|max:50',
+        ];
     }
 
     public function openModal()
@@ -48,20 +51,31 @@ class UserManager extends Component
     {
         $this->validate();
 
-        User::create([
+        $user = User::create([
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
-            'password' => Hash::make('password123'), // Default password
+            'password' => Hash::make('password123'),
         ]);
 
+        if ($user->role === 'mahasiswa') {
+            Data_Mahasiswa::create([
+                'user_id' => $user->id,
+                'nama_mahasiswa' => $user->name,
+                'role' => $user->role,
+            ]);
+        }
+
+        $this->resetInput();
         $this->closeModal();
+        session()->flash('message', 'Pengguna berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        $this->user_id = $id;
+
+        $this->user_id = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
         $this->role = $user->role;
@@ -73,11 +87,7 @@ class UserManager extends Component
 
     public function update()
     {
-        $this->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $this->user_id,
-            'role' => 'required|string|max:50',
-        ]);
+        $this->validate();
 
         $user = User::findOrFail($this->user_id);
         $user->update([
@@ -86,12 +96,15 @@ class UserManager extends Component
             'role' => $this->role,
         ]);
 
+        $this->resetInput();
         $this->closeModal();
+        session()->flash('message', 'Pengguna berhasil diperbarui.');
     }
 
     public function delete($id)
     {
         User::findOrFail($id)->delete();
+        session()->flash('message', 'Pengguna berhasil dihapus.');
     }
 
     private function resetInput()

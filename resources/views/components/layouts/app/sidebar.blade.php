@@ -19,9 +19,9 @@
 
                 <flux:navlist.item icon="document-text" :href="route('beasiswa')" :current="request()->routeIs('beasiswa')" wire:navigate>{{ __('Manajemen Beasiswa') }}</flux:navlist.item>
 
-                <flux:navlist.item icon="document-text" :href="route('laporan_beasiswa')" :current="request()->routeIs('laporan_beasiswa')" wire:navigate>{{ __('Hasil Seleksi Beasiswa') }}</flux:navlist.item>
+                <flux:navlist.item icon="document-text" :href="route('laporan_beasiswa')" :current="request()->routeIs('laporan_beasiswa')" wire:navigate>{{ __('Laporan Beasiswa') }}</flux:navlist.item>
 
-                <flux:navlist.item icon="document-text" :href="route('hasil_seleksi_beasiswa')" :current="request()->routeIs('hasil_seleksi_beasiswa')" wire:navigate>{{ __('Laporan Beasiswa') }}</flux:navlist.item>
+                <flux:navlist.item icon="document-text" :href="route('hasil_seleksi_beasiswa')" :current="request()->routeIs('hasil_seleksi_beasiswa')" wire:navigate>{{ __('Hasil Seleksi Beasiswa') }}</flux:navlist.item>
 
                 <flux:navlist.item icon="users" :href="route('mahasiswa.manajemen')" :current="request()->routeIs('mahasiswa.manajemen')" wire:navigate>{{ __('Manajemen Mahasiswa') }}</flux:navlist.item>
 

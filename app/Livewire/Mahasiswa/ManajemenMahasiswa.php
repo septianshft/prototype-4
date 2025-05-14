@@ -5,30 +5,23 @@ namespace App\Livewire\Mahasiswa;
 use App\Models\Data_Mahasiswa;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
 
 class ManajemenMahasiswa extends Component
 {
     use WithPagination;
 
-    public $nama_mahasiswa, $nim, $ipk, $email, $role, $program_studi;
+    public $nim, $ipk, $program_studi;
+    public $nama_mahasiswa, $email, $role;
     public $data_mahasiswa_id;
     public $isEdit = false;
     public $showModal = false;
     public $search = '';
 
-    protected $rules = [
-        'nama_mahasiswa' => 'required|string|max:255',
-        'nim' => 'required|unique:data_mahasiswa,nim',
-        'ipk' => 'required|numeric|min:0|max:4',
-        'email' => 'required|email',
-        'role' => 'required|string|max:50',
-        'program_studi' => 'required|string|max:100',
-    ];
-
     public function render()
     {
         return view('livewire.mahasiswa.manajemen-mahasiswa', [
-            'mahasiswa' => Data_Mahasiswa::where('nama_mahasiswa', 'like', '%' . $this->search . '%')->paginate(10)
+            'mahasiswa' => Data_Mahasiswa::with('user')->get(),
         ]);
     }
 
@@ -47,63 +40,80 @@ class ManajemenMahasiswa extends Component
 
     public function store()
     {
-        $this->validate();
-
-        Data_Mahasiswa::create([
-            'nama_mahasiswa' => $this->nama_mahasiswa,
-            'nim' => $this->nim,
-            'ipk' => $this->ipk,
-            'email' => $this->email,
-            'role' => $this->role,
-            'program_studi' => $this->program_studi,
+        $this->validate([
+            'nim' => 'required|string|unique:data_mahasiswa,nim',
+            'ipk' => 'required|numeric|min:0|max:4',
+            'program_studi' => 'required|string|max:100',
         ]);
 
+        $user = Auth::user();
+        $nim = $this->nim ?? 'default-nim';
+
+        Data_Mahasiswa::create([
+            'user_id' => $user->id,
+            'nama_mahasiswa' => $user->name,
+            'nim' => $this->null,
+            'ipk' => $this->null,
+            'program_studi' => $this->null,
+        ]);
+
+        $this->resetInput();
         $this->closeModal();
+        session()->flash('message', 'Data mahasiswa berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
-        $mahasiswa = Data_Mahasiswa::findOrFail($id);
+        $mahasiswa = Data_Mahasiswa::with('user')->findOrFail($id);
+
         $this->data_mahasiswa_id = $id;
-        $this->nama_mahasiswa = $mahasiswa->nama_mahasiswa;
         $this->nim = $mahasiswa->nim;
         $this->ipk = $mahasiswa->ipk;
-        $this->email = $mahasiswa->email;
-        $this->role = $mahasiswa->role;
         $this->program_studi = $mahasiswa->program_studi;
+
+        $this->nama_mahasiswa = $mahasiswa->user->name ?? '';
+        $this->email = $mahasiswa->user->email ?? '';
+        $this->role = $mahasiswa->user->role ?? '';
+
         $this->isEdit = true;
         $this->showModal = true;
     }
 
+
     public function update()
     {
-        $this->validate();
+        $this->validate([
+            'nim' => 'required|string|unique:data_mahasiswa,nim,' . $this->data_mahasiswa_id,
+            'ipk' => 'required|numeric|min:0|max:4',
+            'program_studi' => 'required|string|max:100',
+        ]);
 
-        $data = Data_Mahasiswa::findOrFail($this->data_mahasiswa_id);
-        $data->update([
-            'nama_mahasiswa' => $this->nama_mahasiswa,
+        $mahasiswa = Data_Mahasiswa::findOrFail($this->data_mahasiswa_id);
+        $mahasiswa->update([
             'nim' => $this->nim,
             'ipk' => $this->ipk,
-            'email' => $this->email,
-            'role' => $this->role,
             'program_studi' => $this->program_studi,
         ]);
 
         $this->closeModal();
+        session()->flash('message', 'Data mahasiswa berhasil diperbarui.');
     }
 
     public function delete($id)
     {
-        Data_Mahasiswa::findOrFail($id)->delete();
+        $mahasiswa = Data_Mahasiswa::findOrFail($id);
+
+        if ($mahasiswa->user) {
+            $mahasiswa->user->delete();
+        }
+
+        $mahasiswa->delete();
     }
 
     public function resetInput()
     {
-        $this->nama_mahasiswa = '';
         $this->nim = '';
         $this->ipk = '';
-        $this->email = '';
-        $this->role = '';
         $this->program_studi = '';
         $this->data_mahasiswa_id = null;
     }

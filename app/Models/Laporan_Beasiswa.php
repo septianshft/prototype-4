@@ -8,15 +8,11 @@ class Laporan_Beasiswa extends Model
 {
     protected $connection = 'mysql_crud'; // arahkan ke MySQL
     protected $table = 'laporan_beasiswa';
-    protected $fillable = ['nama_laporan', 'file_path', 'beasiswa_id', 'data_mahasiswa_id'];
+    protected $fillable = ['nama_laporan', 'user_id', 'file_path'];
 
-    public function Beasiswa()
-    {
-        return $this->belongsTo(Beasiswa::class);
-    }
 
-    public function Data_Mahasiswa()
+    public function user()
     {
-        return $this->belongsTo(Data_Mahasiswa::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
-}
+    }
