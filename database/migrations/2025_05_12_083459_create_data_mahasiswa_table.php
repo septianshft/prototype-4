@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('nim')->nullable(); // gunakan string untuk NIM agar bisa fleksibel
             $table->float('ipk', 3, 2)->nullable(); // 3 digit, 2 desimal, misalnya: 3.85   
             $table->string('program_studi')->nullable();
+            $table->enum('status_seleksi', ['pending', 'diterima', 'ditolak'])->default('pending');
             $table->timestamps();
         });
     }

@@ -19,4 +19,9 @@ class Beasiswa extends Model
    {
       return $this->hasMany(Feed_Back::class);
    }
+
+   public function laporan_beasiswa()
+{
+    return $this->hasMany(Laporan_Beasiswa::class);
+}
 }

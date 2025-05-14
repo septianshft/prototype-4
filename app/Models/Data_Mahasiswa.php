@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+
 
 class Data_Mahasiswa extends Model
 {
     protected $connection = 'mysql_crud'; // arahkan ke MySQL
     protected $table = 'data_mahasiswa';
-    protected $fillable = ['nama_mahasiswa', 'nim', 'ipk', 'program_studi', 'user_id'];
+    protected $fillable = ['nama_mahasiswa', 'nim', 'ipk', 'program_studi', 'user_id', 'status_seleksi'];
 
     public function Status()
     {
