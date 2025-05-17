@@ -68,4 +68,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Laporan_Beasiswa::class);
     }
+
+    public function beasiswaYangDiapply()
+    {
+        return $this->hasMany(ApplyBeasiswa::class);
+    }
 }

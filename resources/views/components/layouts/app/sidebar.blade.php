@@ -22,8 +22,11 @@
                 <flux:navlist.item icon="document-text" :href="route('laporan_beasiswa')" :current="request()->routeIs('laporan_beasiswa')" wire:navigate> {{ __('Laporan Beasiswa') }}</flux:navlist.item>
                  
                 <flux:navlist.item icon="document-text" :href="route('seleksi.beasiswa')" :current="request()->routeIs('seleksi.beasiswa')" wire:navigate>{{ __('Seleksi Beasiswa') }}</flux:navlist.item>
-
-                <flux:navlist.item icon="users" :href="route('mahasiswa.manajemen')" :current="request()->routeIs('mahasiswa.manajemen')" wire:navigate>{{ __('Manajemen Mahasiswa') }}</flux:navlist.item>
+                @if(auth()->check() && auth()->user()->role === 'admin')
+                    <flux:navlist.item icon="users" :href="route('mahasiswa.manajemen')" :current="request()->routeIs('mahasiswa.manajemen')" wire:navigate>
+                        {{ __('Manajemen Mahasiswa') }}
+                    </flux:navlist.item>
+                @endif
 
                 @if(auth()->check() && auth()->user()->role === 'admin')
                     <flux:navlist.item icon="users" :href="route('admin.user-manager')" :current="request()->routeIs('admin.user-manager')" wire:navigate>

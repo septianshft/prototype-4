@@ -10,13 +10,13 @@ class Status extends Model
     protected $table = 'status';
     protected $fillable = ['status', 'beasiswa_id', 'Data_Mahasiswa_id'];
 
-    public function Beasiswa()
+    public function mahasiswa()
     {
-        return $this->belongsTo(Beasiswa::class);
+        return $this->belongsTo(Data_Mahasiswa::class, 'data_mahasiswa_id');
     }
 
-    public function Data_mahasiswa()
+    public function beasiswa()
     {
-        return $this->belongsTo(Data_mahasiswa::class);
+        return $this->belongsTo(Beasiswa::class, 'beasiswa_id');
     }
 }

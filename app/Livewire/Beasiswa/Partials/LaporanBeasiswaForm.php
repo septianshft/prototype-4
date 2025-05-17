@@ -18,9 +18,7 @@ class LaporanBeasiswaForm extends Component
     public $showModal = false;
     public $isEdit = false;
     public $selectedId;
-    protected $listeners = ['editLaporan'];
-
-
+    protected $listeners = ['editLaporan' => 'editLaporan'];
 
     protected function rules()
     {
@@ -32,17 +30,33 @@ class LaporanBeasiswaForm extends Component
 
     public function openModal()
     {
+        $mahasiswa = Auth::user()->dataMahasiswa;
+
+        if (! $mahasiswa || $mahasiswa->status_seleksi !== 'diterima') {
+            session()->flash('error', 'Kamu belum bisa mengisi laporan karena belum diterima beasiswa.');
+            return;
+        }
+
         $this->reset(['nama_laporan', 'file', 'isEdit', 'selectedId']);
         $this->showModal = true;
     }
+
 
     public function closeModal()
     {
         $this->showModal = false;
     }
 
+    // store()
     public function store()
     {
+        $mahasiswa = Auth::user()->dataMahasiswa;
+
+        if (! $mahasiswa || $mahasiswa->status_seleksi !== 'diterima') {
+            session()->flash('error', 'Kamu belum bisa mengirim laporan karena belum diterima beasiswa.');
+            return;
+        }
+
         $this->validate();
 
         $path = $this->file->store('laporan');
@@ -55,8 +69,9 @@ class LaporanBeasiswaForm extends Component
 
         $this->closeModal();
         session()->flash('message', 'Laporan berhasil disimpan.');
-        $this->emit('laporanUpdated');
+        $this->dispatch('laporanUpdated');
     }
+
 
     public function editLaporan($id)
     {
@@ -67,6 +82,7 @@ class LaporanBeasiswaForm extends Component
         $this->showModal = true;
     }
 
+    // update()
     public function update()
     {
         $this->validate();
@@ -85,6 +101,8 @@ class LaporanBeasiswaForm extends Component
 
         $this->closeModal();
         session()->flash('message', 'Laporan berhasil diperbarui.');
+
+        // GANTI emit DENGAN dispatch
         $this->dispatch('laporanUpdated');
     }
 

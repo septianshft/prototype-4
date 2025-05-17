@@ -26,6 +26,11 @@ class LaporanBeasiswaTable extends Component
         session()->flash('message', 'Laporan berhasil dihapus.');
     }
 
+    public function triggerEdit($id)
+    {
+        $this->dispatch('editLaporan', $id);
+    }
+
     public function showDetail($id)
     {
         $this->selectedLaporan = Laporan_Beasiswa::with(['user', 'beasiswa'])->findOrFail($id);
@@ -71,14 +76,20 @@ class LaporanBeasiswaTable extends Component
     {
         $user = Auth::user();
 
-        $query = Laporan_Beasiswa::with('user', 'beasiswa')->latest();
+        $laporans = Laporan_Beasiswa::query()
+            ->when(Auth::user()->role === 'mahasiswa', function ($query) {
+                $mahasiswa = Auth::user()->dataMahasiswa;
+                if ($mahasiswa && $mahasiswa->status_seleksi === 'diterima') {
+                    $query->where('user_id', Auth::id());
+                } else {
+                    $query->whereNull('id');
+                }
+            })
+            ->latest()
+            ->paginate(10);
 
-        if ($user->role === 'mahasiswa') {
-            $query->where('user_id', $user->id);
-        }
-
-        $laporans = $query->paginate(10);
-
-        return view('livewire.beasiswa.partials.laporan-beasiswa-table', compact('laporans'));
+        return view('livewire.beasiswa.partials.laporan-beasiswa-table', [
+            'laporans' => $laporans
+        ]);
     }
 }

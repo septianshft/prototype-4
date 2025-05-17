@@ -1,10 +1,12 @@
 <?php
 
 use App\Livewire\Admin\UserManager;
+use App\Livewire\Beasiswa\ApplyBeasiswaPage;
 use App\Livewire\Beasiswa\HasilSeleksiBeasiswa;
 use App\Livewire\Beasiswa\LaporanBeasiswaPage;
 use App\Livewire\Beasiswa\LaporanBeasiswaShow;
 use App\Livewire\Beasiswa\ManajemenBeasiswa;
+use App\Livewire\Beasiswa\Partials\ApplyBeasiswaPage as PartialsApplyBeasiswaPage;
 use App\Livewire\Beasiswa\partials\LaporanBeasiswaShow as PartialsLaporanBeasiswaShow;
 use App\Livewire\Beasiswa\SeleksiBeasiswa;
 use Illuminate\Support\Facades\Route;
@@ -67,3 +69,6 @@ Route::get('/laporan-beasiswa/{id}', PartialsLaporanBeasiswaShow::class)
 Route::get('/seleksi-beasiswa', SeleksiBeasiswa::class)
     ->middleware(['auth'])
     ->name('seleksi.beasiswa');
+
+// Route::get('/beasiswa/apply/{id}', PartialsApplyBeasiswaPage::class)->name('beasiswa.apply');
+

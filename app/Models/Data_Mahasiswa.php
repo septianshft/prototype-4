@@ -26,4 +26,16 @@ class Data_Mahasiswa extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function beasiswas()
+    {
+        return $this->belongsToMany(Beasiswa::class, 'status', 'apply_beasiswa', 'user_id') //kalo ada error disini cari dengan NGENTOT
+            ->withPivot('status')
+            ->withTimestamps();
+    }
+
+    // public function ApplyBeasiswa()
+    // {
+    //     return $this->hasMany(ApplyBeasiswa::class);
+    // }
 }

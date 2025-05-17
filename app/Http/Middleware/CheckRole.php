@@ -27,7 +27,7 @@ class CheckRole
         if ($user->role !== $role) {
             switch ($user->role) {
                 case 'admin':
-                    return redirect('/admin/dashboard');
+                    return redirect('/dashboard');
                 case 'dosen':
                     return redirect('/dashboard');
                 case 'mahasiswa':

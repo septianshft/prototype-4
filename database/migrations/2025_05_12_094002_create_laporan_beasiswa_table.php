@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('nama_laporan');
             $table->string('file_path');
+            $table->string('feedback')->nullable();
             $table->timestamps();
         });
     }

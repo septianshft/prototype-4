@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('beasiswa', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('dosen_id')->constrained('users')->onDelete('cascade');
             $table->String('nama_beasiswa');
             $table->string('nama_penyelenggara');
-            $table->date('periode');
-            $table->integer('kuota');
+            $table->string('periode');
+            $table->integer('kuota')->default(1);
+            $table->enum('status', ['open', 'full'])->default('open');
             $table->text('deskripsi')->nullable();
             $table->timestamps();
         });

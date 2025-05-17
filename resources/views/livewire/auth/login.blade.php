@@ -45,7 +45,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         if ($user->role === 'admin') {
             // Assuming admin dashboard route is named 'admin.dashboard'
             // Make sure to define this route in routes/web.php
-            $this->redirect(route('admin.dashboard'), navigate: true);
+            $this->redirect(route('dashboard'), navigate: true);
             return;
         } elseif ($user->role === 'talent') {
             // Assuming talent dashboard route is named 'talent.dashboard'

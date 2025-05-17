@@ -28,7 +28,7 @@
                     <td class="px-6 py-4 border-b text-black">{{ $laporan->created_at->format('d M Y') }}</td>
                     @if (auth()->user()->role === 'mahasiswa')
                         <td class="px-6 py-4 border-b space-x-2 text-center">
-                            <button wire:click="$emit('editLaporan', {{ $laporan->id }})"
+                            <button wire:click="triggerEdit({{ $laporan->id }})"
                                 class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-md transition-all">✏️</button>
 
 
