@@ -18,6 +18,6 @@ class Laporan_Beasiswa extends Model
 
     public function beasiswa()
     {
-        return $this->belongsTo(Beasiswa::class);
+        return $this->belongsTo(Beasiswa::class, 'beasiswa_id');
     }
 }

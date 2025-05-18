@@ -12,10 +12,17 @@
     @endforeach
 
     @if (session()->has('success'))
-        <div class="text-green-600 mt-2">{{ session('success') }}</div>
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show"
+            class="bg-green-100 text-green-800 px-4 py-3 rounded mb-4 border border-green-300 transition">
+            ✅ {{ session('success') }}
+        </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="text-red-600 mt-2">{{ session('error') }}</div>
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
+            class="bg-red-100 text-red-800 px-4 py-3 rounded mb-4 border border-red-300 transition">
+            ⚠️ {{ session('error') }}
+        </div>
     @endif
+
 </div>

@@ -1,6 +1,11 @@
 <div class="p-6 bg-white rounded shadow-md">
     <h2 class="text-2xl font-bold text-gray-700 mb-4">Manajemen Beasiswa</h2>
     {{-- Notifikasi --}}
+    @if (session()->has('success'))
+        <div class="mb-4 p-3 bg-green-200 text-green-800 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
     @if (session()->has('message'))
         <div class="mb-4 p-3 bg-green-200 text-green-800 rounded">
             {{ session('message') }}

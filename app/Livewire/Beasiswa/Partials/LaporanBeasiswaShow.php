@@ -15,7 +15,14 @@ class LaporanBeasiswaShow extends Component
 
     public function mount($id)
     {
-        $this->laporan = Laporan_Beasiswa::with(['user', 'beasiswa'])->findOrFail($id);
+        $laporan = Laporan_Beasiswa::with(['user.dataMahasiswa', 'beasiswa'])->findOrFail($id);
+
+        // Mahasiswa hanya boleh melihat laporan miliknya sendiri
+        if (Auth::user()->role === 'mahasiswa' && $laporan->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak diizinkan melihat laporan ini.');
+        }
+
+        $this->laporan = $laporan;
         $this->feedback = $this->laporan->feedback;
     }
 

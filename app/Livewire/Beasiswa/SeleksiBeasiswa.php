@@ -14,115 +14,145 @@ class SeleksiBeasiswa extends Component
 
     public function accept($applyId)
     {
-        if (Auth::user()->role !== 'dosen') {
-            session()->flash('error', 'Hanya dosen yang dapat melakukan aksi ini.');
+        $user = Auth::user();
+
+        if (!in_array($user->role, ['dosen', 'admin'])) {
+            session()->flash('error', 'Hanya dosen atau admin yang dapat melakukan aksi ini.');
+            return;
+        }
+
+        $apply = ApplyBeasiswa::with('beasiswa')->find($applyId);
+        if (!$apply || !$apply->beasiswa) {
+            session()->flash('error', 'Data tidak ditemukan.');
+            return;
+        }
+
+        if ($user->role === 'dosen' && $apply->beasiswa->dosen_id !== $user->id) {
+            session()->flash('error', 'Anda tidak memiliki akses ke beasiswa ini.');
+            return;
+        }
+
+        if ($apply->status !== 'pending') {
+            session()->flash('error', 'Status sudah ditentukan sebelumnya.');
+            return;
+        }
+
+        $jumlahDiterima = ApplyBeasiswa::where('beasiswa_id', $apply->beasiswa_id)
+            ->where('status', 'diterima')->count();
+
+        if ($jumlahDiterima >= $apply->beasiswa->kuota) {
+            session()->flash('error', 'Kuota beasiswa sudah penuh.');
+            return;
+        }
+
+        $apply->update(['status' => 'diterima']);
+
+        // Update status_seleksi di data_mahasiswa
+        Data_Mahasiswa::where('user_id', $apply->user_id)
+            ->update(['status_seleksi' => 'diterima']);
+
+        // Periksa apakah kuota sudah penuh
+        $jumlahDiterimaBaru = ApplyBeasiswa::where('beasiswa_id', $apply->beasiswa_id)
+            ->where('status', 'diterima')->count();
+
+        if ($jumlahDiterimaBaru >= $apply->beasiswa->kuota) {
+            $apply->beasiswa->update(['status' => 'full']);
+        }
+
+        session()->flash('success', 'Mahasiswa berhasil diterima.');
+        $this->dispatch('refreshComponent');
+    }
+
+    public function reject($applyId)
+    {
+        $user = Auth::user();
+
+        if (!in_array($user->role, ['dosen', 'admin'])) {
+            session()->flash('error', 'Hanya dosen atau admin yang dapat melakukan aksi ini.');
             return;
         }
 
         $apply = ApplyBeasiswa::with('beasiswa')->find($applyId);
 
-        if (!$apply || !$apply->beasiswa) {
-            session()->flash('error', 'Data apply beasiswa tidak ditemukan.');
+        if (!$apply) {
+            session()->flash('error', 'Data tidak ditemukan.');
             return;
         }
 
-        $beasiswa = $apply->beasiswa;
-
-        if ($beasiswa->dosen_id !== Auth::id()) {
+        if ($user->role === 'dosen' && $apply->beasiswa->dosen_id !== $user->id) {
             session()->flash('error', 'Anda tidak memiliki akses ke beasiswa ini.');
             return;
         }
 
-        // Cek kuota
-        $jumlahDiterima = ApplyBeasiswa::where('beasiswa_id', $beasiswa->id)
-            ->where('status', 'diterima')
-            ->count();
-
-        if ($jumlahDiterima >= $beasiswa->kuota) {
-            session()->flash('error', 'Kuota beasiswa sudah penuh.');
-            return;
-        }
-
-        // Update status apply beasiswa jadi diterima
-        $apply->update(['status' => 'diterima']);
-
-        // Update status mahasiswa
-        $mahasiswa = Data_Mahasiswa::where('user_id', $apply->user_id)->first();
-        if ($mahasiswa) {
-            $mahasiswa->status_seleksi = 'diterima';
-            $mahasiswa->save();
-        }
-
-        // Jika kuota sudah penuh, update status beasiswa
-        $jumlahDiterimaBaru = ApplyBeasiswa::where('beasiswa_id', $beasiswa->id)
-            ->where('status', 'diterima')
-            ->count();
-
-        if ($jumlahDiterimaBaru >= $beasiswa->kuota) {
-            $beasiswa->update(['status' => 'full']);
-        }
-
-        session()->flash('success', 'Mahasiswa berhasil diterima.');
-
-        $this->dispatch('refreshComponent');
-    }
-
-
-
-    public function reject($applyId)
-    {
-        if (Auth::user()->role !== 'dosen') {
-            session()->flash('error', 'Hanya dosen yang dapat melakukan aksi ini.');
-            return;
-        }
-
-        $apply = ApplyBeasiswa::find($applyId);
-
-        if (!$apply) {
-            session()->flash('error', 'Data apply beasiswa tidak ditemukan.');
+        if ($apply->status !== 'pending') {
+            session()->flash('error', 'Status sudah ditentukan sebelumnya.');
             return;
         }
 
         $apply->update(['status' => 'ditolak']);
 
-        session()->flash('success', 'Pengajuan beasiswa mahasiswa ditolak.');
+        Data_Mahasiswa::where('user_id', $apply->user_id)
+            ->update(['status_seleksi' => 'ditolak']);
 
+        session()->flash('success', 'Pengajuan ditolak.');
         $this->dispatch('refreshComponent');
     }
 
     public function render()
     {
-
         $user = Auth::user();
 
-        $query = ApplyBeasiswa::query()
-            ->with('beasiswa', 'user')
-            ->join('data_mahasiswa', 'data_mahasiswa.user_id', '=', 'apply_beasiswa.user_id')
-            ->join('beasiswa', 'beasiswa.id', '=', 'apply_beasiswa.beasiswa_id')
-            ->select(
-                'apply_beasiswa.id as apply_id',
-                'apply_beasiswa.status',
-                'data_mahasiswa.nama_mahasiswa',
-                'data_mahasiswa.nim',
-                'data_mahasiswa.ipk',
-                'data_mahasiswa.program_studi',
-                'apply_beasiswa.user_id',
-                'apply_beasiswa.beasiswa_id'
-            );
+        // Untuk mahasiswa: ambil dari data_mahasiswa sendiri
+        if ($user->role === 'mahasiswa') {
+            $query = Data_Mahasiswa::query()
+                ->join('apply_beasiswa', 'apply_beasiswa.user_id', '=', 'data_mahasiswa.user_id')
+                ->join('beasiswa', 'beasiswa.id', '=', 'apply_beasiswa.beasiswa_id')
+                ->where('data_mahasiswa.user_id', $user->id)
+                ->select(
+                    'data_mahasiswa.nama_mahasiswa',
+                    'data_mahasiswa.nim',
+                    'data_mahasiswa.ipk',
+                    'data_mahasiswa.program_studi',
+                    'data_mahasiswa.status_seleksi',
+                    'apply_beasiswa.status as apply_status',
+                    'apply_beasiswa.id as apply_id',
+                    'apply_beasiswa.beasiswa_id'
+                );
 
-        // Filter role
-        if ($user->role === 'dosen') {
-            $query->where('beasiswa.dosen_id', $user->id);
-        } elseif ($user->role === 'mahasiswa') {
-            $query->where('apply_beasiswa.user_id', $user->id);
+            if ($this->sortStatus !== 'all') {
+                $query->where('data_mahasiswa.status_seleksi', $this->sortStatus);
+            }
+
+            $pendaftar = $query->get();
         }
+        // Untuk dosen dan admin: ambil semua pendaftar sesuai akses
+        else {
+            $query = ApplyBeasiswa::query()
+                ->with(['beasiswa', 'user'])
+                ->join('data_mahasiswa', 'data_mahasiswa.user_id', '=', 'apply_beasiswa.user_id')
+                ->join('beasiswa', 'beasiswa.id', '=', 'apply_beasiswa.beasiswa_id')
+                ->select(
+                    'apply_beasiswa.id as apply_id',
+                    'apply_beasiswa.status',
+                    'data_mahasiswa.nama_mahasiswa',
+                    'data_mahasiswa.nim',
+                    'data_mahasiswa.ipk',
+                    'data_mahasiswa.program_studi',
+                    'data_mahasiswa.status_seleksi',
+                    'apply_beasiswa.user_id',
+                    'apply_beasiswa.beasiswa_id'
+                );
 
-        // ✅ Filter status
-        if ($this->sortStatus !== 'all') {
-            $query->where('apply_beasiswa.status', '=', $this->sortStatus);
-        }   
+            if ($user->role === 'dosen') {
+                $query->where('beasiswa.dosen_id', $user->id);
+            }
 
-        $pendaftar = $query->get();
+            if ($this->sortStatus !== 'all') {
+                $query->where('data_mahasiswa.status_seleksi', $this->sortStatus);
+            }
+
+            $pendaftar = $query->get();
+        }
 
         return view('livewire.beasiswa.seleksi-beasiswa', [
             'pendaftar' => $pendaftar,

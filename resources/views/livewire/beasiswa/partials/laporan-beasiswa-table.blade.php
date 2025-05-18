@@ -31,7 +31,11 @@
                     {{-- Aksi --}}
                     @if (auth()->user()->role === 'mahasiswa')
                         <td class="px-6 py-4 border-b text-center space-x-2">
-                            <button wire:click="triggerEdit({{ $laporan->id }})"
+                            <a href="{{ route('laporan.beasiswa.show', $laporan->id) }}"
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">
+                                Detail
+                            </a>
+                            <button wire:click="$emit('editLaporan', {{ $laporan->id }})"
                                 class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded transition">
                                 Edit
                             </button>

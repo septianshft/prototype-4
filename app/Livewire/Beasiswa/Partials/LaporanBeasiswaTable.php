@@ -96,13 +96,24 @@ class LaporanBeasiswaTable extends Component
         $user = Auth::user();
 
         $laporans = Laporan_Beasiswa::query()
-            ->when(Auth::user()->role === 'mahasiswa', function ($query) {
-                $mahasiswa = Auth::user()->dataMahasiswa;
+            ->when($user->role === 'mahasiswa', function ($query) use ($user) {
+                $mahasiswa = $user->dataMahasiswa;
                 if ($mahasiswa && $mahasiswa->status_seleksi === 'diterima') {
-                    $query->where('user_id', Auth::id());
+                    $query->where('user_id', $user->id);
                 } else {
                     $query->whereNull('id');
                 }
+            })
+            ->when($user->role === 'dosen', function ($query) use ($user) {
+                $query->whereIn('user_id', function ($subquery) use ($user) {
+                    $subquery->select('user_id')
+                        ->from('apply_beasiswa')
+                        ->whereIn('beasiswa_id', function ($subsub) use ($user) {
+                            $subsub->select('id')
+                                ->from('beasiswa')
+                                ->where('dosen_id', $user->id);
+                        });
+                });
             })
             ->latest()
             ->paginate(10);

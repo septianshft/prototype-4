@@ -240,19 +240,31 @@ class ManajemenBeasiswa extends Component
     {
         $this->validate();
 
+        $dosenId = null;
+
+        // Cek apakah nama_penyelenggara cocok dengan dosen
+        $dosen = \App\Models\User::where('name', $this->nama_penyelenggara)
+            ->where('role', 'dosen')
+            ->first();
+
+        if ($dosen) {
+            $dosenId = $dosen->id;
+        }
+
         Beasiswa::create([
             'nama_beasiswa' => $this->nama_beasiswa,
             'nama_penyelenggara' => $this->nama_penyelenggara,
             'periode' => $this->periode,
             'kuota' => $this->kuota,
             'deskripsi' => $this->deskripsi,
-            'dosen_id' => Auth::id(),
+            'dosen_id' => $dosenId, // <--- diisi jika ketemu
         ]);
 
         $this->resetForm();
         $this->closeModal();
         session()->flash('message', 'Beasiswa berhasil ditambahkan!');
     }
+
 
     public function create()
     {

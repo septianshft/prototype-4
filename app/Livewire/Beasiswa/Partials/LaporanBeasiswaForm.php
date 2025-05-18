@@ -64,6 +64,7 @@ class LaporanBeasiswaForm extends Component
         Laporan_Beasiswa::create([
             'nama_laporan' => $this->nama_laporan,
             'file_path' => $path,
+            'beasiswa_id' => $mahasiswa->beasiswa_id,
             'user_id' => Auth::id(),
         ]);
 
