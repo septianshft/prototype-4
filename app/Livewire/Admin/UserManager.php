@@ -15,6 +15,9 @@ class UserManager extends Component
     public $user_id, $name, $email, $role, $search = '';
     public $isEdit = false;
     public $showModal = false;
+    protected $listeners = ['deleteConfirmed' => 'performDelete'];
+    public $deleteId;
+
 
     public function render()
     {
@@ -101,9 +104,29 @@ class UserManager extends Component
         session()->flash('message', 'Pengguna berhasil diperbarui.');
     }
 
+    public function confirmDelete($id)
+    {
+        $this->deleteId = $id;
+
+        $this->dispatch('showModal', [
+            'title' => 'Hapus Pengguna',
+            'message' => 'Apakah Anda yakin ingin menghapus pengguna ini?',
+            'confirmText' => 'Hapus',
+            'cancelText' => 'Batal',
+            'onConfirm' => 'deleteConfirmed',
+        ]);
+    }
+
+    public function performDelete()
+    {
+        $this->delete($this->deleteId);
+    }
+
     public function delete($id)
     {
-        User::findOrFail($id)->delete();
+        $user = User::findOrFail($id);
+        $user->delete();
+
         session()->flash('message', 'Pengguna berhasil dihapus.');
     }
 

@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('data_mahasiswa', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable(); // Pindahkan ke atas
+            $table->unsignedBigInteger('user_id')->nullable(); 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('nama_mahasiswa');
-            $table->string('nim')->nullable(); // gunakan string untuk NIM agar bisa fleksibel
-            $table->float('ipk', 3, 2)->nullable(); // 3 digit, 2 desimal, misalnya: 3.85   
+            $table->string('nim')->nullable(); 
+            $table->float('ipk', 3, 2)->nullable(); 
             $table->string('program_studi')->nullable();
             $table->enum('status_seleksi', ['pending', 'diterima', 'ditolak'])->default('pending');
             $table->timestamps();

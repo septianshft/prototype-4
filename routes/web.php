@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\dashboard as ControllersDashboard;
 use App\Livewire\Admin\UserManager;
 use App\Livewire\Beasiswa\ApplyBeasiswaPage;
 use App\Livewire\Beasiswa\HasilSeleksiBeasiswa;
@@ -9,17 +10,20 @@ use App\Livewire\Beasiswa\ManajemenBeasiswa;
 use App\Livewire\Beasiswa\Partials\ApplyBeasiswaPage as PartialsApplyBeasiswaPage;
 use App\Livewire\Beasiswa\partials\LaporanBeasiswaShow as PartialsLaporanBeasiswaShow;
 use App\Livewire\Beasiswa\SeleksiBeasiswa;
+use App\Livewire\Dashboard\Mahasiswadashboard;
+use App\Livewire\Dashboard\Roledashboard;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Livewire\Mahasiswa\ManajemenMahasiswa;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/login', function () {
     return view('login');
 })->name('home');
 
-Route::view('/dashboard', 'dashboard')
-    ->middleware(['auth', 'verified', 'role:mahasiswa']) // Add role:user middleware
-    ->name('dashboard');
+// Route::view('/dashboard', 'dashboard')
+//     ->middleware(['auth', 'verified', 'role:mahasiswa']) // Add role:user middleware
+//     ->name('dashboard');
 
 // Talent Dashboard R
 
@@ -70,5 +74,10 @@ Route::get('/seleksi-beasiswa', SeleksiBeasiswa::class)
     ->middleware(['auth'])
     ->name('seleksi.beasiswa');
 
-// Route::get('/beasiswa/apply/{id}', PartialsApplyBeasiswaPage::class)->name('beasiswa.apply');
+Route::get('/mahasiswadashboard', Mahasiswadashboard::class)
+    ->middleware(['auth', 'verified', 'role:mahasiswa'])
+    ->name('dashboard.mahasiswa');
 
+Route::get('/roledashboard', Roledashboard::class)
+    ->middleware(['auth'])
+    ->name('role.dashboard');

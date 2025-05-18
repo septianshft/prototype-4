@@ -92,6 +92,7 @@ class SeleksiBeasiswa extends Component
 
     public function render()
     {
+
         $user = Auth::user();
 
         $query = ApplyBeasiswa::query()
@@ -119,7 +120,7 @@ class SeleksiBeasiswa extends Component
         // ✅ Filter status
         if ($this->sortStatus !== 'all') {
             $query->where('apply_beasiswa.status', '=', $this->sortStatus);
-        }
+        }   
 
         $pendaftar = $query->get();
 

@@ -18,7 +18,7 @@ class ManajemenBeasiswa extends Component
     public $role;
     public $showModal = false;
     public $isEdit = false;
-
+    public $deleteId;
 
     // Form fields (contoh untuk create/update)
     public $beasiswaId;
@@ -119,10 +119,24 @@ class ManajemenBeasiswa extends Component
         session()->flash('message', 'Beasiswa berhasil diupdate!');
     }
 
-    public function delete($id)
+    public function confirmDelete($id)
     {
-        Beasiswa::findOrFail($id)->delete();
+        $this->deleteId = $id;
+        $this->dispatch('showModal', [
+            'title' => 'Hapus Data Beasiswa',
+            'message' => 'Apakah Anda yakin ingin menghapus beasiswa ini?',
+            'confirmText' => 'Hapus',
+            'cancelText' => 'Batal',
+            'onConfirm' => 'deleteConfirmed',
+        ]);
+    }
+
+    #[\Livewire\Attributes\On('deleteConfirmed')]
+    public function deleteConfirmed()
+    {
+        Beasiswa::findOrFail($this->deleteId)->delete();
         session()->flash('message', 'Beasiswa berhasil dihapus!');
+        $this->deleteId = null;
     }
 
     public function resetForm()

@@ -33,8 +33,8 @@ class ApplyBeasiswa extends Model
         return $this->belongsTo(Beasiswa::class);
     }
 
-    // public function dataMahasiswa()
-    // {
-    //     return $this->hasMany(Data_Mahasiswa::class);
-    // }
+    public function dataMahasiswa()
+    {
+        return $this->hasOne(Data_Mahasiswa::class);
+    }
 }

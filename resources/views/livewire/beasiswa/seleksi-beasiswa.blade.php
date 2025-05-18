@@ -1,14 +1,21 @@
-<div class="p-6 bg-gray-100 min-h-screen">
+<div class="p-6 bg-white rounded shadow-md">
     <h2 class="text-2xl font-bold text-gray-700 mb-4">
         {{ $role === 'dosen' ? 'Seleksi Beasiswa' : 'Hasil Seleksi Beasiswa' }}
     </h2>
-    {{-- <select wire:model="sortStatus" id="sortStatus" class="border rounded px-3 py-2 ml-2">
-        <option value="all">Semua</option>
-        <option value="pending">Pending</option>
-        <option value="diterima">Diterima</option>
-        <option value="ditolak">Ditolak</option>
-    </select> --}}
-    {{-- Tabel Seleksi Beasiswa --}}
+
+    {{-- Filter Status Seleksi --}}
+    <div class="mb-4">
+        <label for="sortStatus" class="text-gray-700 mr-2">Filter Status Seleksi:</label>
+        <select id="sortStatus" wire:model="sortStatus"
+            class="border rounded px-3 py-1 text-sm focus:outline-none focus:ring focus:border-blue-300">
+            <option value="all">Semua</option>
+            <option value="diterima">Diterima</option>
+            <option value="ditolak">Ditolak</option>
+            <option value="pending">Pending</option>
+        </select>
+    </div>
+
+    {{-- Tabel --}}
     <table class="min-w-full text-sm text-left text-gray-700 bg-white rounded shadow-md">
         <thead class="bg-gray-200 text-gray-700">
             <tr>
@@ -25,7 +32,7 @@
         </thead>
         <tbody>
             @foreach ($pendaftar as $mhs)
-                <tr class="hover:bg-gray-100">
+                <tr class="hover:bg-gray-50">
                     <td class="px-4 py-2">{{ $mhs->nama_mahasiswa }}</td>
                     <td class="px-4 py-2">{{ $mhs->nim }}</td>
                     <td class="px-4 py-2">{{ $mhs->ipk }}</td>
@@ -44,7 +51,6 @@
                             {{ ucfirst($status ?? 'pending') }}
                         </span>
                     </td>
-
                     @if ($role === 'dosen')
                         <td class="px-4 py-2 space-x-2">
                             <button wire:click="accept({{ $mhs->apply_id }})"

@@ -5,15 +5,19 @@
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
         @switch($role)
             @case('admin')
-                @include('dashboard.roles.admin')
+                @include('dashboard.roles.admin', $data ?? [])
             @break
 
             @case('dosen')
-                @include('dashboard.roles.dosen')
+                @include('dashboard.roles.dosen', $data ?? [])
+            @break
+
+            @case('mahasiswa')
+                @include('dashboard.roles.mahasiswa', $data ?? [])
             @break
 
             @case('vicedirector')
-                @include('dashboard.roles.vicedirector')
+                @include('dashboard.roles.vicedirector', $data ?? [])
             @break
 
             @default

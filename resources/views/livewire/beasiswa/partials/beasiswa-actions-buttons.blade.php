@@ -1,6 +1,6 @@
 @if($role == 'admin' || $role == 'dosen')
     <button wire:click="edit({{ $data->id }})"
-        class="bg-yellow-300 px-2 py-1 rounded">✏️</button>
+        class="bg-blue-600 hover:bg-blue-800 px-2 py-1 rounded">Edit</button>
     <button wire:click="delete({{ $data->id }})"
         class="bg-red-600 text-white px-2 py-1 rounded">🗑️</button>
 

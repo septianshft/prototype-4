@@ -41,7 +41,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         Session::regenerate();
 
         // Redirect based on role
-        $user = Auth::user();   
+        $user = Auth::user();
         if ($user->role === 'admin') {
             // Assuming admin dashboard route is named 'admin.dashboard'
             // Make sure to define this route in routes/web.php
@@ -88,72 +88,82 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="grid grid-cols-5 rounded-xl overflow-hidden shadow-lg bg-white dark:bg-neutral-900">
-    <!-- Left image -->
-    <div class="hidden md:flex col-span-3 relative items-center justify-center bg-cover bg-center"
+<div
+    class="grid md:grid-cols-5 rounded-xl overflow-hidden shadow-2xl bg-white dark:bg-neutral-900 max-w-6xl mx-auto mt-16">
+    <!-- Left Image Section -->
+    <div class="hidden md:flex col-span-3 relative items-center bg-cover bg-center"
         style="background-image: url('{{ asset('images/3260649.jpg') }}'); min-height: 600px;">
-        <div class="absolute inset-0 bg-black/50"></div>
-        <div class="relative z-10 text-white p-8">
-            <img src="{{ asset('images/telkom-logo.png') }}" alt="Logo" class="mb-4 w-24">
-            <h2 class="text-2xl font-bold">Selamat Datang di</h2>
-            <h2 class="text-2xl font-bold">Sistem Pengelolaan Beasiswa</h2>
-            <p class="mt-2">PUI PT IS-IoT</p>
+        <div class="w-full px-10 z-10 text-black text-left">
+            <img src="{{ asset('images/telkom-logo.png') }}" alt="Logo" class="mb-6 w-24">
+            <h2 class="text-4xl font-extrabold leading-tight">Selamat Datang di</h2>
+            <h2 class="text-4xl font-extrabold leading-tight">Sistem Pengelolaan Beasiswa</h2>
+            <p class="mt-4 text-lg font-light">PUI PT IS-IoT</p>
         </div>
     </div>
 
-    <!-- Form -->
+    <!-- Right Form Section -->
     <div class="col-span-5 md:col-span-2 flex items-center justify-center p-8">
-        <form wire:submit="login" class="w-full max-w-md space-y-6">
+        <form wire:submit="login" class="w-full max-w-md space-y-8">
+            <!-- Title -->
             <div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Login</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-300">Enter your email and password below to log in</p>
+                <h2 class="text-4xl font-bold text-gray-900 dark:text-white">Login</h2>
+                <p class="text-base text-gray-600 dark:text-gray-300">Masukkan email dan password Anda</p>
             </div>
 
+            <!-- Email -->
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-white">Email</label>
+                <label for="email"
+                    class="block text-sm font-semibold text-gray-700 dark:text-white mb-1">Email</label>
                 <input wire:model.defer="email" type="email" id="email" required
-                    class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-neutral-800 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base">
                 @error('email')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
+            <!-- Password -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-white">Password</label>
+                <label for="password"
+                    class="block text-sm font-semibold text-gray-700 dark:text-white mb-1">Password</label>
                 <input wire:model.defer="password" type="password" id="password" required
-                    class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-neutral-800 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base">
                 @error('password')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="flex items-center">
-                <input wire:model="remember" id="remember" type="checkbox"
-                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                <label for="remember" class="ml-2 block text-sm text-gray-900 dark:text-white">Remember me</label>
+            <!-- Remember -->
+            <div class="flex items-center justify-between">
+                <label class="flex items-center space-x-2 text-sm text-gray-700 dark:text-white">
+                    <input wire:model="remember" type="checkbox"
+                        class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                    <span>Remember me</span>
+                </label>
+
+                @if (Route::has('password.request'))
+                    <a href="{{ route('password.request') }}" class="text-sm text-indigo-600 hover:underline">
+                        Forgot your password?
+                    </a>
+                @endif
             </div>
 
+            <!-- Button -->
             <div>
                 <button type="submit"
-                    class="w-full inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none">
+                    class="w-full inline-flex justify-center rounded-lg bg-indigo-600 px-6 py-3 text-white font-semibold hover:bg-indigo-700 focus:outline-none transition text-lg">
                     Login
                 </button>
             </div>
 
-            @if (Route::has('password.request'))
-                <div class="text-right">
-                    <a href="{{ route('password.request') }}" class="text-sm text-indigo-600 hover:underline">Forgot
-                        your password?</a>
-                </div>
-            @endif
-
+            <!-- Register Link -->
             @if (Route::has('register'))
-                <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
-                    {{ __('Don\'t have an account?') }}
-                    <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
+                <div class="text-center text-sm text-zinc-600 dark:text-zinc-400">
+                    {{ __("Don't have an account?") }}
+                    <flux:link :href="route('register')" wire:navigate class="text-indigo-600 hover:underline">
+                        {{ __('Sign up') }}
+                    </flux:link>
                 </div>
             @endif
         </form>
-
     </div>
 </div>

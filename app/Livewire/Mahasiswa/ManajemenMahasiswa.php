@@ -17,6 +17,8 @@ class ManajemenMahasiswa extends Component
     public $isEdit = false;
     public $showModal = false;
     public $search = '';
+    protected $listeners = ['deleteConfirmed' => 'performDelete'];
+    public $deleteId;
 
     public function render()
     {
@@ -99,6 +101,24 @@ class ManajemenMahasiswa extends Component
         session()->flash('message', 'Data mahasiswa berhasil diperbarui.');
     }
 
+    public function confirmDelete($id)
+    {
+        $this->deleteId = $id;
+
+        $this->dispatch('showModal', [
+            'title' => 'Hapus Data Mahasiswa',
+            'message' => 'Apakah Anda yakin ingin menghapus data ini?',
+            'confirmText' => 'Hapus',
+            'cancelText' => 'Batal',
+            'onConfirm' => 'deleteConfirmed',
+        ]);
+    }
+
+    public function performDelete()
+    {
+        $this->delete($this->deleteId);
+    }
+
     public function delete($id)
     {
         $mahasiswa = Data_Mahasiswa::findOrFail($id);
@@ -108,7 +128,10 @@ class ManajemenMahasiswa extends Component
         }
 
         $mahasiswa->delete();
+
+        session()->flash('message', 'Data mahasiswa berhasil dihapus.');
     }
+
 
     public function resetInput()
     {

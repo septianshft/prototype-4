@@ -57,10 +57,9 @@
                     @if ($role === 'admin' || $role === 'dosen')
                         <td class="px-4 py-2 space-x-2">
                             <button wire:click="edit({{ $beasiswa->id }})"
-                                class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded">✏️ Edit</button>
-                            <button wire:click="delete({{ $beasiswa->id }})"
-                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
-                                onclick="confirm('Yakin ingin hapus beasiswa ini?') || event.stopImmediatePropagation()">🗑️
+                                class="bg-blue-600 hover:bg-blue-800 text-white px-3 py-1 rounded">Edit</button>
+                            <button wire:click="confirmDelete({{ $beasiswa->id }})"
+                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
                                 Hapus</button>
                         </td>
                     @elseif($role === 'mahasiswa')
@@ -172,4 +171,6 @@
             </div>
         </div>
     @endif
+    <livewire:beasiswa.partials.confirmation-modal />
+
 </div>

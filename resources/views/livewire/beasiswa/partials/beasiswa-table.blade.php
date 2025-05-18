@@ -27,10 +27,10 @@
                 @if ($role === 'admin' || $role === 'dosen')
                     <td class="px-6 py-3 space-x-2">
                         <button wire:click="edit({{ $data->id }})"
-                            class="bg-yellow-400 hover:bg-yellow-500 px-3 py-1 rounded text-white text-sm font-semibold">
-                            ✏️ Edit
+                            class="bg-blue-600 hover:bg-blue-800 px-3 py-1 rounded text-white text-sm font-semibold">
+                            Edit
                         </button>
-                        <button wire:click="delete({{ $data->id }})"
+                        <button wire:click="confimDelete({{ $data->id }})"
                             class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm font-semibold">
                             🗑️ Hapus
                         </button>
@@ -47,4 +47,5 @@
             </tr>
         @endforeach
     </tbody>
+    <livewire:beasiswa.partials.confirmation-modal />
 </table>

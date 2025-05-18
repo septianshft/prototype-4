@@ -29,7 +29,7 @@ class CheckRole
                 case 'admin':
                     return redirect('/dashboard');
                 case 'dosen':
-                    return redirect('/dashboard');
+                    return redirect('/mahasiswadashboard');
                 case 'mahasiswa':
                     return redirect('/dashboard');
                 case 'direktur':

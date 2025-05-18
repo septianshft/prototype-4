@@ -59,7 +59,7 @@ class LaporanBeasiswaForm extends Component
 
         $this->validate();
 
-        $path = $this->file->store('laporan');
+        $path = $this->file->store('laporan', 'public');
 
         Laporan_Beasiswa::create([
             'nama_laporan' => $this->nama_laporan,

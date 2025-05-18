@@ -15,6 +15,26 @@ class LaporanBeasiswaTable extends Component
     public $selectedLaporan = null;
     public $isEditMode = false;  // Menentukan apakah form dalam mode edit
     public $laporanId, $nama_laporan, $file_path;  // Properti untuk form edit
+    protected $listeners = ['deleteConfirmed' => 'performDelete', 'laporanUpdated' => '$refresh',];
+    public $deleteId;
+
+    public function confirmDelete($id)
+    {
+        $this->deleteId = $id;
+
+        $this->dispatch('showModal', [
+            'title' => 'Hapus Pengguna',
+            'message' => 'Apakah Anda yakin ingin menghapus pengguna ini?',
+            'confirmText' => 'Hapus',
+            'cancelText' => 'Batal',
+            'onConfirm' => 'deleteConfirmed',
+        ]);
+    }
+
+    public function performDelete()
+    {
+        $this->delete($this->deleteId);
+    }
 
     public function delete($id)
     {
@@ -41,7 +61,6 @@ class LaporanBeasiswaTable extends Component
         $this->selectedLaporan = null;
     }
 
-    // Fungsi untuk memulai proses edit
     public function edit($id)
     {
         $laporan = Laporan_Beasiswa::findOrFail($id);
