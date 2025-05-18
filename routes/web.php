@@ -17,9 +17,12 @@ use Livewire\Volt\Volt;
 use App\Livewire\Mahasiswa\ManajemenMahasiswa;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
-Route::get('/login', function () {
-    return view('login');
-})->name('home');
+Volt::route('/login', 'login')->name('login');
+
+// Set root URL langsung redirect ke login
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 
 // Route::view('/dashboard', 'dashboard')
 //     ->middleware(['auth', 'verified', 'role:mahasiswa']) // Add role:user middleware
