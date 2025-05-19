@@ -38,4 +38,6 @@ class Data_Mahasiswa extends Model
     // {
     //     return $this->hasMany(ApplyBeasiswa::class);
     // }
+
+    
 }

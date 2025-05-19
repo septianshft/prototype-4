@@ -12,6 +12,12 @@ class SeleksiBeasiswa extends Component
     protected $listeners = ['refreshComponent' => '$refresh'];
     public $sortStatus = 'all';
 
+    public function updatedSortStatus()
+    {
+        // This will automatically refresh the component when the filter changes
+        // No need to add any code here, Livewire will handle it
+    }
+
     public function accept($applyId)
     {
         $user = Auth::user();
@@ -102,22 +108,17 @@ class SeleksiBeasiswa extends Component
     public function render()
     {
         $user = Auth::user();
+        $pendaftar = collect();
 
-        // Untuk mahasiswa: ambil dari data_mahasiswa sendiri
         if ($user->role === 'mahasiswa') {
             $query = Data_Mahasiswa::query()
                 ->join('apply_beasiswa', 'apply_beasiswa.user_id', '=', 'data_mahasiswa.user_id')
                 ->join('beasiswa', 'beasiswa.id', '=', 'apply_beasiswa.beasiswa_id')
                 ->where('data_mahasiswa.user_id', $user->id)
                 ->select(
-                    'data_mahasiswa.nama_mahasiswa',
-                    'data_mahasiswa.nim',
-                    'data_mahasiswa.ipk',
-                    'data_mahasiswa.program_studi',
-                    'data_mahasiswa.status_seleksi',
+                    'beasiswa.nama_beasiswa',
                     'apply_beasiswa.status as apply_status',
-                    'apply_beasiswa.id as apply_id',
-                    'apply_beasiswa.beasiswa_id'
+                    'data_mahasiswa.status_seleksi'
                 );
 
             if ($this->sortStatus !== 'all') {
@@ -125,9 +126,7 @@ class SeleksiBeasiswa extends Component
             }
 
             $pendaftar = $query->get();
-        }
-        // Untuk dosen dan admin: ambil semua pendaftar sesuai akses
-        else {
+        } else {
             $query = ApplyBeasiswa::query()
                 ->with(['beasiswa', 'user'])
                 ->join('data_mahasiswa', 'data_mahasiswa.user_id', '=', 'apply_beasiswa.user_id')
@@ -140,6 +139,7 @@ class SeleksiBeasiswa extends Component
                     'data_mahasiswa.ipk',
                     'data_mahasiswa.program_studi',
                     'data_mahasiswa.status_seleksi',
+                    'beasiswa.nama_beasiswa',
                     'apply_beasiswa.user_id',
                     'apply_beasiswa.beasiswa_id'
                 );
@@ -152,7 +152,7 @@ class SeleksiBeasiswa extends Component
                 $query->where('data_mahasiswa.status_seleksi', $this->sortStatus);
             }
 
-            $pendaftar = $query->get();
+            $pendaftar = $query->get()->map(fn($item) => (object) $item->toArray());
         }
 
         return view('livewire.beasiswa.seleksi-beasiswa', [
