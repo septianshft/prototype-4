@@ -85,7 +85,8 @@ class SeleksiBeasiswa extends Component
         }
 
         if ($apply->status !== 'pending') {
-            session()->flash('error', 'Status sudah ditentukan sebelumnya.');
+            $aktor = ($apply->status === 'diterima') ? 'diterima' : 'ditolak';
+            session()->flash('error', "Pengajuan sudah $aktor oleh pengguna lain.");
             return;
         }
 
