@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\dashboard as ControllersDashboard;
+use App\Livewire\Beasiswa\ManajemenBeasiswaDetail;
 use App\Livewire\Admin\UserManager;
 use App\Livewire\Beasiswa\ApplyBeasiswaPage;
 use App\Livewire\Beasiswa\HasilSeleksiBeasiswa;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Livewire\Mahasiswa\ManajemenMahasiswa;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+
 
 Volt::route('/login', 'login')->name('login');
 
@@ -84,3 +86,7 @@ Route::get('/mahasiswadashboard', Mahasiswadashboard::class)
 Route::get('/roledashboard', Roledashboard::class)
     ->middleware(['auth'])
     ->name('role.dashboard');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/beasiswa/{beasiswa}/detail', ManajemenBeasiswaDetail::class)->name('beasiswa.detail');
+});

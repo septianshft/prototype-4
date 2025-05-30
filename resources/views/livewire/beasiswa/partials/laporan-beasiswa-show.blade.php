@@ -9,7 +9,8 @@
         <p>
             <strong>File Laporan:</strong>
             @if ($laporan->file_path)
-                <a href="{{ Storage::url($laporan->file_path) }}" target="_blank" class="text-blue-600 underline hover:text-blue-800 transition">
+                <a href="{{ Storage::url($laporan->file_path) }}" target="_blank"
+                    class="text-blue-600 underline hover:text-blue-800 transition">
                     Lihat File
                 </a>
             @else
@@ -23,25 +24,65 @@
                 <textarea id="feedback" wire:model.defer="feedback" rows="4"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 transition"></textarea>
 
-                <div class="mt-3 space-x-2">
-                    <button wire:click="simpanFeedback"
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">
-                         Simpan
-                    </button>
-                    <a href="{{ url()->previous() }}"
+                <button wire:click="simpanFeedback"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition mt-2">
+                    Simpan Feedback
+                </button>
+
+                <div class="mt-4 space-x-2">
+                    @if ($laporan->acc_count < 6 && $laporan->status_acc !== 'rejected')
+                        <button wire:click="accLaporan('approved')"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition">
+                            ACC Laporan
+                        </button>
+
+                        <button wire:click="accLaporan('rejected')"
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition">
+                            Tolak Laporan
+                        </button>
+                    @endif
+
+                    <button wire:click="batal"
                         class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition">
                         Batal
-                    </a>
+                    </button>
                 </div>
+
+                <p class="mt-4 font-semibold"><strong>Status Laporan:</strong>
+                    @if ($laporan->status_acc === 'approved')
+                        Disetujui
+                    @elseif ($laporan->status_acc === 'rejected')
+                        Ditolak
+                    @else
+                        Menunggu ACC
+                    @endif
+                </p>
+            </div>
+        @elseif(Auth::user()->role === 'mahasiswa')
+            <p><strong>Status Laporan:</strong>
+                <span @class([
+                    'text-green-600' => $laporan->status_acc === 'approved',
+                    'text-red-600' => $laporan->status_acc === 'rejected',
+                    'text-yellow-600' => $laporan->status_acc === 'pending',
+                ])>
+                    @if ($laporan->status_acc === 'approved')
+                        Disetujui
+                    @elseif ($laporan->status_acc === 'rejected')
+                        Ditolak
+                    @else
+                        Menunggu ACC
+                    @endif
+                </span>
+            </p>
+
+            <div class="mt-4">
+                <button wire:click="batal"
+                    class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition">
+                    Kembali
+                </button>
             </div>
         @else
             <p><strong>Feedback:</strong> {{ $laporan->feedback ?? '-' }}</p>
-            <div class="mt-4">
-                <a href="{{ url()->previous() }}"
-                    class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition">
-                    Kembali
-                </a>
-            </div>
         @endif
     </div>
 
@@ -51,3 +92,9 @@
         </div>
     @endif
 </div>
+
+<script>
+    window.addEventListener('navigate-back', () => {
+        history.back();
+    });
+</script>

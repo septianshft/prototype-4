@@ -37,4 +37,10 @@ class ApplyBeasiswa extends Model
     {
         return $this->hasOne(Data_Mahasiswa::class);
     }
+
+    public function laporan()
+    {
+        return $this->hasMany(Laporan_Beasiswa::class, 'user_id', 'user_id')
+            ->where('beasiswa_id', $this->beasiswa_id);
+    }
 }

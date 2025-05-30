@@ -1,15 +1,11 @@
 <div class="p-4 bg-white shadow rounded">
     {{-- Filter Status Seleksi --}}
     <div class="mb-4">
-        <label for="sortStatus" class="block text-sm font-medium text-gray-700 mb-1">Filter Status:</label>
-        <select wire:model.live="sortStatus" id="sortStatus" class="border rounded p-2">
-            <option value="all">Semua</option>
-            <option value="pending">Pending</option>
-            <option value="diterima">Diterima</option>
-            <option value="ditolak">Ditolak</option>
-        </select>
-        <p class="text-sm text-gray-500 mt-2">Filter Aktif: {{ $sortStatus === 'all' ? 'Semua' : ucfirst($sortStatus) }}
-        </p>
+        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Cari:</label>
+        <input type="text" id="search" wire:model.debounce.500ms="search"
+            placeholder="Cari NIM, Nama, Status, Prodi, Beasiswa" class="border px-4 py-2 rounded w-full" />
+        <p class="text-red-500 mt-2">DEBUG SEARCH: {{ $search }}</p>
+
     </div>
 
     {{-- Tabel --}}
@@ -22,7 +18,7 @@
                 <th class="px-4 py-2">Program Studi</th>
                 <th class="px-4 py-2">Nama Beasiswa</th>
                 <th class="px-4 py-2">Status Seleksi</th>
-                @if (in_array($role, ['dosen', 'admin']))
+                @if (in_array($role, ['dosen']))
                     <th class="px-4 py-2">Aksi</th>
                 @endif
             </tr>
@@ -33,11 +29,11 @@
                     <td class="px-4 py-2">{{ $mhs->nama_mahasiswa }}</td>
                     <td class="px-4 py-2">{{ $mhs->nim }}</td>
                     <td class="px-4 py-2">{{ $mhs->ipk }}</td>
-                    <td class="px-4 py-2">{{ $mhs->program_studi }}</td>
+                    <td class="px-4 py-2">{{ $mhs->nama_program_studi ?? '-' }}</td>
                     <td class="px-4 py-2">{{ $mhs->nama_beasiswa ?? '-' }}</td>
                     <td class="px-4 py-2">
                         @php
-                            $statusSeleksi = $mhs->status_seleksi;
+                            $statusSeleksi = $mhs->status ?? 'pending';
                             $badgeColor = match ($statusSeleksi) {
                                 'diterima' => 'bg-green-100 text-green-800',
                                 'ditolak' => 'bg-red-100 text-red-800',
@@ -45,20 +41,19 @@
                             };
                         @endphp
                         <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $badgeColor }}">
-                            {{ ucfirst($statusSeleksi ?? 'pending') }}
+                            {{ ucfirst($statusSeleksi) }}
                         </span>
-
                     </td>
-                    @if (in_array($role, ['dosen', 'admin']))
+                    @if (in_array($role, ['dosen']))
                         <td class="px-4 py-2 space-x-2">
                             <button wire:click="accept({{ $mhs->apply_id }})"
                                 class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded disabled:opacity-50"
-                                @if (($mhs->status ?? $mhs->apply_status) !== 'pending') disabled @endif>
+                                @if ($mhs->status !== 'pending' || $mhs->hasAccepted) disabled @endif>
                                 ✅ Terima
                             </button>
                             <button wire:click="reject({{ $mhs->apply_id }})"
                                 class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded disabled:opacity-50"
-                                @if (($mhs->status ?? $mhs->apply_status) !== 'pending') disabled @endif>
+                                @if ($mhs->status !== 'pending' || $mhs->hasAccepted) disabled @endif>
                                 ❌ Tolak
                             </button>
                         </td>
@@ -74,4 +69,9 @@
             @endforelse
         </tbody>
     </table>
+
+    {{-- Pagination --}}
+    <div class="mt-4">
+        {{ $pendaftar->links() }}
+    </div>
 </div>

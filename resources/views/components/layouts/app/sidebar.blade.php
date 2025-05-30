@@ -3,6 +3,7 @@
 
 <head>
     @include('partials.head')
+    @livewireStyles
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -131,6 +132,9 @@
     </flux:header>
 
     {{ $slot }}
+
+      {{-- WAJIB UNTUK LIVEWIRE --}}
+    @livewireScripts
 
     @fluxScripts
 </body>

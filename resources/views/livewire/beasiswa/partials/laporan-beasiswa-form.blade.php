@@ -1,17 +1,24 @@
 <div>
     @php
-        $mahasiswa = Auth::user()->dataMahasiswa;
+        $apply = \App\Models\ApplyBeasiswa::where('user_id', auth()->id())
+            ->where('status', 'diterima')
+            ->with('beasiswa')
+            ->first();
     @endphp
 
-    {{-- Status Seleksi --}}
-    @if ($mahasiswa)
-        <div class="mb-2 text-sm text-gray-600">
-            Status Seleksi: <strong>{{ ucfirst($mahasiswa->status_seleksi) }}</strong>
+    @if ($apply)
+        <div class="text-sm text-gray-600 mb-2">
+            Status Beasiswa: <strong class="text-green-600">Diterima</strong>
+            <br>
+            Beasiswa: <strong>{{ $beasiswa_nama ?? ($apply->beasiswa->nama_beasiswa ?? '-') }}</strong>
+        </div>
+    @else
+        <div class="text-sm text-gray-600 mb-2">
+            Status Beasiswa: <strong class="text-yellow-600">Belum diterima</strong>
         </div>
     @endif
 
-    {{-- Tombol Tambah jika diterima --}}
-    @if ($mahasiswa && $mahasiswa->status_seleksi === 'diterima')
+    @if ($apply)
         <button wire:click="openModal"
             class="mb-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition">
             + Data Laporan
@@ -22,7 +29,7 @@
         </div>
     @endif
 
-    {{-- Modal --}}
+    {{-- Modal Form --}}
     @if ($showModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
             <div class="bg-white w-full max-w-3xl p-6 rounded-lg shadow-lg transform scale-100 transition-transform">
@@ -31,8 +38,6 @@
                 </h2>
 
                 <form wire:submit.prevent="{{ $isEdit ? 'update' : 'store' }}" class="space-y-4">
-
-                    {{-- Nama Laporan --}}
                     <div>
                         <label class="block font-medium mb-1 text-gray-700">Nama Laporan:</label>
                         <input type="text" wire:model="nama_laporan"
@@ -40,6 +45,19 @@
                         @error('nama_laporan')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
+                    </div>
+
+                    {{-- Jenis Laporan Dropdown --}}
+                    <div>
+                        <label class="block font-medium mb-1 text-gray-700">Jenis Laporan:</label>
+                        <select wire:model="jenis_laporan"
+                            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                            <option value="progress">Progress</option>
+                            @if ($laporanTeracc >= 6)
+                                <!-- Display Final after 6 approved reports -->
+                                <option value="final">Final</option>
+                            @endif
+                        </select>
                     </div>
 
                     {{-- File Upload --}}

@@ -19,7 +19,9 @@ return new class extends Migration
             $table->string('periode');
             $table->integer('kuota')->default(1);
             $table->enum('status', ['open', 'full'])->default('open');
+            $table->foreignId('program_studi_id')->constrained('program_studi');
             $table->text('deskripsi')->nullable();
+            $table->date('deadline_pendaftaran')->nullable();
             $table->timestamps();
         });
     }

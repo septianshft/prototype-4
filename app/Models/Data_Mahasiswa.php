@@ -10,7 +10,7 @@ class Data_Mahasiswa extends Model
 {
     protected $connection = 'mysql_crud'; // arahkan ke MySQL
     protected $table = 'data_mahasiswa';
-    protected $fillable = ['nama_mahasiswa', 'nim', 'ipk', 'program_studi', 'user_id', 'status_seleksi'];
+    protected $fillable = ['nama_mahasiswa', 'nim', 'ipk', 'program_studi_id', 'user_id', 'status_seleksi'];
 
     public function Status()
     {
@@ -20,6 +20,11 @@ class Data_Mahasiswa extends Model
     public function Feed_Back()
     {
         return $this->hasMany(Feed_Back::class);
+    }
+
+    public function programStudi()
+    {
+        return $this->belongsTo(ProgramStudi::class, 'program_studi_id');
     }
 
     public function user()
@@ -39,5 +44,5 @@ class Data_Mahasiswa extends Model
     //     return $this->hasMany(ApplyBeasiswa::class);
     // }
 
-    
+
 }

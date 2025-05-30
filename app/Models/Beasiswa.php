@@ -8,11 +8,25 @@ class Beasiswa extends Model
 {
    protected $connection = 'mysql_crud'; // arahkan ke MySQL
    protected $table = 'beasiswa';
-   protected $fillable = ['nama_beasiswa', 'nama_penyelenggara', 'periode', 'kuota', 'deskripsi', 'dosen_id'];
+   protected $fillable = ['nama_beasiswa', 'nama_penyelenggara', 'periode', 'kuota', 'deskripsi', 'dosen_id', 'deadline_pendaftaran', 'program_studi_id'];
+
+   protected $casts = [
+      'deadline_pendaftaran' => 'datetime',
+   ];
+
+   public function dosenPenyelenggara()
+   {
+      return $this->belongsTo(User::class, 'dosen_id');
+   }
 
    public function Aksi()
    {
       return $this->hasMany(Status::class);
+   }
+
+   public function programStudi()
+   {
+      return $this->belongsTo(ProgramStudi::class);
    }
 
    public function Feed_Back()

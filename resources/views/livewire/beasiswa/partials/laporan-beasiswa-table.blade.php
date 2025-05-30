@@ -6,6 +6,7 @@
                 <th class="px-6 py-4 border-b">Nama Mahasiswa</th>
                 <th class="px-6 py-4 border-b">File</th>
                 <th class="px-6 py-4 border-b">Tanggal</th>
+                <th class="px-6 py-4 border-b">Status Laporan</th>
                 @if (in_array(auth()->user()->role, ['mahasiswa', 'admin', 'dosen', 'vice_director']))
                     <th class="px-6 py-4 border-b text-center">Aksi</th>
                 @endif
@@ -27,6 +28,19 @@
                     <td class="px-6 py-4 border-b text-gray-800">
                         {{ $laporan->created_at->format('d M Y') }}
                     </td>
+                    <td
+                        class="px-6 py-4 border-b text-gray-800 text-center font-semibold
+                @if ($laporan->status_acc === 'approved') @elseif($laporan->status_acc === 'rejected')
+                @else @endif
+            ">
+                        @if ($laporan->status_acc === 'approved')
+                            Disetujui
+                        @elseif($laporan->status_acc === 'rejected')
+                            Ditolak
+                        @else
+                            Menunggu ACC
+                        @endif
+                    </td>
 
                     {{-- Aksi --}}
                     @if (auth()->user()->role === 'mahasiswa')
@@ -35,7 +49,8 @@
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">
                                 Detail
                             </a>
-                            <button wire:click="$emit('editLaporan', {{ $laporan->id }})"
+                            {{-- Tombol Edit dan Delete --}}
+                            <button wire:click="emitEditLaporan({{ $laporan->id }})"
                                 class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded transition">
                                 Edit
                             </button>
@@ -54,12 +69,13 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center py-4 text-sm text-gray-500">
+                    <td colspan="8" class="text-center py-4 text-sm text-gray-500">
                         Tidak ada data laporan.
                     </td>
                 </tr>
             @endforelse
         </tbody>
+
     </table>
 
     {{-- Pagination --}}

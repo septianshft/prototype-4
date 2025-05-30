@@ -1,7 +1,5 @@
 <?php
 
-// LaporanBeasiswaShow.php
-
 namespace App\Livewire\Beasiswa\partials;
 
 use App\Models\Laporan_Beasiswa;
@@ -17,18 +15,16 @@ class LaporanBeasiswaShow extends Component
     {
         $laporan = Laporan_Beasiswa::with(['user.dataMahasiswa', 'beasiswa'])->findOrFail($id);
 
-        // Mahasiswa hanya boleh melihat laporan miliknya sendiri
         if (Auth::user()->role === 'mahasiswa' && $laporan->user_id !== Auth::id()) {
             abort(403, 'Anda tidak diizinkan melihat laporan ini.');
         }
 
         $this->laporan = $laporan;
-        $this->feedback = $this->laporan->feedback;
+        $this->feedback = $laporan->feedback;
     }
 
     public function simpanFeedback()
     {
-        // Cek role dosen
         if (Auth::user()->role !== 'dosen') {
             abort(403, 'Hanya dosen yang dapat memberikan feedback.');
         }
@@ -37,6 +33,64 @@ class LaporanBeasiswaShow extends Component
         $this->laporan->save();
 
         session()->flash('message', 'Feedback berhasil disimpan.');
+    }
+
+    public function accLaporan($status)
+    {
+        $user = Auth::user();
+
+        if (!in_array($user->role, ['dosen', 'admin'])) {
+            session()->flash('error', 'Hanya dosen atau admin yang dapat melakukan aksi ini.');
+            return;
+        }
+
+        $laporan = $this->laporan;
+
+        if (!$laporan->beasiswa) {
+            session()->flash('error', 'Data beasiswa tidak ditemukan.');
+            return;
+        }
+
+        if ($user->role === 'dosen' && $laporan->beasiswa->dosen_id !== $user->id) {
+            session()->flash('error', 'Anda bukan dosen penyelenggara beasiswa ini.');
+            return;
+        }
+
+        if ($laporan->status_acc === 'approved') {
+            session()->flash('error', 'Laporan sudah disetujui, tidak bisa diubah.');
+            return;
+        }
+
+        if ($laporan->status_acc === 'rejected') {
+            session()->flash('error', 'Laporan sudah ditolak, tidak bisa diubah.');
+            return;
+        }
+
+        if ($status === 'approved') {
+            if ($laporan->acc_count < 6) {
+                $laporan->acc_count += 1;
+            }
+            $laporan->status_acc = 'approved';
+            $laporan->approved_by = $user->id;
+            $laporan->approved_at = now();
+            $laporan->feedback = $this->feedback;
+            $laporan->save();
+            session()->flash('message', 'Laporan berhasil di-acc (' . $laporan->acc_count . '/6).');
+        } elseif ($status === 'rejected') {
+            $laporan->status_acc = 'rejected';
+            $laporan->feedback = $this->feedback;
+            $laporan->approved_by = $user->id;
+            $laporan->approved_at = now();
+            $laporan->save();
+            session()->flash('message', 'Laporan ditolak.');
+        }
+
+        $this->dispatch('laporanUpdated'); // gunakan emit bukan dispatchBrowserEvent
+    }
+
+    public function batal()
+    {
+        $this->dispatch('navigate-back');
     }
 
     public function render()

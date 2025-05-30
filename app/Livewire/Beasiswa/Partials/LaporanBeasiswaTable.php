@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Beasiswa\Partials;
 
+use App\Models\ApplyBeasiswa;
 use App\Models\Laporan_Beasiswa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -74,6 +75,11 @@ class LaporanBeasiswaTable extends Component
         $this->isEditMode = true;
     }
 
+    public function emitEditLaporan($id)
+    {
+        $this->dispatch('editLaporan', $id);
+    }
+
     // Fungsi untuk menyimpan perubahan (update)
     public function update()
     {
@@ -97,8 +103,11 @@ class LaporanBeasiswaTable extends Component
 
         $laporans = Laporan_Beasiswa::query()
             ->when($user->role === 'mahasiswa', function ($query) use ($user) {
-                $mahasiswa = $user->dataMahasiswa;
-                if ($mahasiswa && $mahasiswa->status_seleksi === 'diterima') {
+                $diterima = ApplyBeasiswa::where('user_id', $user->id)
+                    ->where('status', 'diterima')
+                    ->exists();
+
+                if ($diterima) {
                     $query->where('user_id', $user->id);
                 } else {
                     $query->whereNull('id');
