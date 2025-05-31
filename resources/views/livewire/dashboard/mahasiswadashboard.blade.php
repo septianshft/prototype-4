@@ -22,7 +22,10 @@
 
                         <div>
                             <p class="text-sm text-gray-500">Program Studi</p>
-                            <p class="text-2xl font-bold">{{ $mahasiswa->program_studi ?? '-' }}</p>
+                            <p class="text-2xl font-bold">
+                                {{ $mahasiswa->program_studi ?? '-' }}
+                                ({{ $mahasiswa->jenjang ?? '-' }})
+                            </p>
                         </div>
 
                         <div>

@@ -1,11 +1,9 @@
 <div class="p-4 bg-white shadow rounded">
-    {{-- Filter Status Seleksi --}}
+    <h2 class="text-2xl font-bold text-gray-700 mb-4">Seleksi Mahasiswa</h2>
     <div class="mb-4">
         <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Cari:</label>
-        <input type="text" id="search" wire:model.debounce.500ms="search"
-            placeholder="Cari NIM, Nama, Status, Prodi, Beasiswa" class="border px-4 py-2 rounded w-full" />
-        <p class="text-red-500 mt-2">DEBUG SEARCH: {{ $search }}</p>
-
+        <input type="text" id="search" wire:model.live="search" placeholder="Cari NIM, Nama, Status, Prodi, Beasiswa"
+            class="border px-4 py-2 rounded w-full" />
     </div>
 
     {{-- Tabel --}}
@@ -15,7 +13,7 @@
                 <th class="px-4 py-2">Nama</th>
                 <th class="px-4 py-2">NIM</th>
                 <th class="px-4 py-2">IPK</th>
-                <th class="px-4 py-2">Program Studi</th>
+                <th class="px-4 py-2">Program Studi </th> 
                 <th class="px-4 py-2">Nama Beasiswa</th>
                 <th class="px-4 py-2">Status Seleksi</th>
                 @if (in_array($role, ['dosen']))
@@ -29,7 +27,9 @@
                     <td class="px-4 py-2">{{ $mhs->nama_mahasiswa }}</td>
                     <td class="px-4 py-2">{{ $mhs->nim }}</td>
                     <td class="px-4 py-2">{{ $mhs->ipk }}</td>
-                    <td class="px-4 py-2">{{ $mhs->nama_program_studi ?? '-' }}</td>
+                    <td class="px-4 py-2">
+                        {{ $mhs->nama_program_studi ?? '-' }} ({{ $mhs->jenjang ?? '-' }})
+                    </td> <!-- tampil seperti yang kamu mau -->
                     <td class="px-4 py-2">{{ $mhs->nama_beasiswa ?? '-' }}</td>
                     <td class="px-4 py-2">
                         @php
@@ -69,6 +69,7 @@
             @endforelse
         </tbody>
     </table>
+
 
     {{-- Pagination --}}
     <div class="mt-4">

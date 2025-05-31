@@ -22,7 +22,7 @@ class MahasiswaDashboard extends Component
         $mahasiswaBase = DB::table('data_mahasiswa as dm')
             ->leftJoin('program_studi as ps', 'dm.program_studi_id', '=', 'ps.id')
             ->where('dm.user_id', $userId)
-            ->select('dm.nama_mahasiswa', 'dm.nim', 'ps.program_studi as program_studi')
+            ->select('dm.nama_mahasiswa', 'dm.nim', 'ps.program_studi as program_studi', 'ps.jenjang as jenjang')
             ->first();
 
         $beasiswaDiterima = DB::table('apply_beasiswa as ab')

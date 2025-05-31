@@ -22,12 +22,15 @@ class ManajemenBeasiswaDetail extends Component
     {
         $this->beasiswaId = $beasiswa->id;
         $this->beasiswa = $beasiswa;
+        $this->loadMahasiswas();
+
 
         $this->mahasiswas = ApplyBeasiswa::select(
             'apply_beasiswa.id AS apply_id',
             'data_mahasiswa.nama_mahasiswa',
             'data_mahasiswa.nim',
             'program_studi.program_studi',
+            'program_studi.jenjang',
             'apply_beasiswa.user_id'
         )
             ->join('data_mahasiswa', 'data_mahasiswa.user_id', '=', 'apply_beasiswa.user_id')
@@ -51,7 +54,25 @@ class ManajemenBeasiswaDetail extends Component
             'file_path' => $laporan->file_path ? Storage::url($laporan->file_path) : null,
         ])->toArray();
 
-        $this->hideTableMahasiswa = true; // ⬅️ ketika klik, sembunyikan table mahasiswa
+        $this->hideTableMahasiswa = true;
+        // ⬅️ ketika klik, sembunyikan table mahasiswa
+    }
+
+    public function loadMahasiswas()
+    {
+        $this->mahasiswas = ApplyBeasiswa::select(
+            'apply_beasiswa.id AS apply_id',
+            'data_mahasiswa.nama_mahasiswa',
+            'data_mahasiswa.nim',
+            'program_studi.program_studi',
+            'program_studi.jenjang',
+            'apply_beasiswa.user_id'
+        )
+            ->join('data_mahasiswa', 'data_mahasiswa.user_id', '=', 'apply_beasiswa.user_id')
+            ->join('program_studi', 'program_studi.id', '=', 'data_mahasiswa.program_studi_id')
+            ->where('apply_beasiswa.beasiswa_id', $this->beasiswaId)
+            ->where('apply_beasiswa.status', 'diterima')
+            ->get();
     }
 
 
@@ -62,26 +83,20 @@ class ManajemenBeasiswaDetail extends Component
         $this->laporanDetail = [];
     }
 
+    public function hideLaporan()
+    {
+        $this->laporanDetail = null;
+        $this->hideTableMahasiswa = false;
+        $this->loadMahasiswas();
+    }
+
     public function updatedShowLaporanModal() {}
 
 
     public function render()
     {
-        $mahasiswas = ApplyBeasiswa::select(
-            'apply_beasiswa.id AS apply_id',
-            'data_mahasiswa.nama_mahasiswa',
-            'data_mahasiswa.nim',
-            'program_studi.program_studi',
-            'apply_beasiswa.user_id'
-        )
-            ->join('data_mahasiswa', 'data_mahasiswa.user_id', '=', 'apply_beasiswa.user_id')
-            ->join('program_studi', 'program_studi.id', '=', 'data_mahasiswa.program_studi_id')
-            ->where('apply_beasiswa.beasiswa_id', $this->beasiswaId)
-            ->where('apply_beasiswa.status', 'diterima')
-            ->get();
-
         return view('livewire.beasiswa.manajemen-beasiswa-detail', [
-            'mahasiswas' => $mahasiswas
+            'mahasiswas' => $this->mahasiswas
         ]);
     }
 }

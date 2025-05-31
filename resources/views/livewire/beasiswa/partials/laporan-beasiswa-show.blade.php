@@ -5,7 +5,12 @@
         <p><strong>Nama Laporan:</strong> {{ $laporan->nama_laporan }}</p>
         <p><strong>Nama Mahasiswa:</strong> {{ $laporan->user->dataMahasiswa->nama_mahasiswa ?? '-' }}</p>
         <p><strong>NIM:</strong> {{ $laporan->user->dataMahasiswa->nim ?? '-' }}</p>
-        <p><strong>Program Studi:</strong> {{ $laporan->user->dataMahasiswa->program_studi ?? '-' }}</p>
+        <p>
+            <strong>Program Studi:</strong>
+            {{ $laporan->user->dataMahasiswa->programStudi->program_studi ?? '-' }}
+            ({{ $laporan->user->dataMahasiswa->programStudi->jenjang ?? '-' }})
+        </p>
+
         <p>
             <strong>File Laporan:</strong>
             @if ($laporan->file_path)
@@ -70,7 +75,7 @@
                     @elseif ($laporan->status_acc === 'rejected')
                         Ditolak
                     @else
-                        Menunggu ACC
+                        Pending
                     @endif
                 </span>
             </p>

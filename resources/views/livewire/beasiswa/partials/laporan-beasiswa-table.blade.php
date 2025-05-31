@@ -38,7 +38,7 @@
                         @elseif($laporan->status_acc === 'rejected')
                             Ditolak
                         @else
-                            Menunggu ACC
+                            Pending
                         @endif
                     </td>
 

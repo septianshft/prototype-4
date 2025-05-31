@@ -119,6 +119,7 @@ class SeleksiBeasiswa extends Component
                     'data_mahasiswa.nim',
                     'data_mahasiswa.ipk',
                     'program_studi.program_studi as nama_program_studi',
+                    'program_studi.jenjang',
                     'beasiswa.nama_beasiswa',
                     'apply_beasiswa.user_id',
                     'apply_beasiswa.beasiswa_id'
@@ -158,6 +159,7 @@ class SeleksiBeasiswa extends Component
                 'data_mahasiswa.nim',
                 'data_mahasiswa.ipk',
                 'program_studi.program_studi as nama_program_studi',
+                'program_studi.jenjang',
                 'beasiswa.nama_beasiswa',
                 'apply_beasiswa.user_id',
                 'apply_beasiswa.beasiswa_id'

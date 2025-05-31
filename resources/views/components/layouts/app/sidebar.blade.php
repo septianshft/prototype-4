@@ -3,7 +3,7 @@
 
 <head>
     @include('partials.head')
-    @livewireStyles
+    @vite('resources/js/app.js')
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
