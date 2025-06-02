@@ -44,20 +44,21 @@
 
                     {{-- Aksi --}}
                     @if (auth()->user()->role === 'mahasiswa')
-                        <td class="px-6 py-4 border-b text-center space-x-2">
-                            <a href="{{ route('laporan.beasiswa.show', $laporan->id) }}"
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">
-                                Detail
-                            </a>
-                            {{-- Tombol Edit dan Delete --}}
-                            <button wire:click="emitEditLaporan({{ $laporan->id }})"
-                                class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded transition">
-                                Edit
-                            </button>
-                            <button wire:click="confirmDelete({{ $laporan->id }})"
-                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition">
-                                🗑️
-                            </button>
+                        <td class="px-6 py-4 border-b text-center">
+                            <div class="flex justify-center items-center flex-nowrap gap-2">
+                                <a href="{{ route('laporan.beasiswa.show', $laporan->id) }}"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition text-sm">
+                                    Detail
+                                </a>
+                                <button wire:click="emitEditLaporan({{ $laporan->id }})"
+                                    class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded transition text-sm">
+                                    Edit
+                                </button>
+                                <button wire:click="confirmDelete({{ $laporan->id }})"
+                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition text-sm">
+                                    🗑️
+                                </button>
+                            </div>
                         </td>
                     @elseif(in_array(auth()->user()->role, ['admin', 'dosen', 'vice_director']))
                         <td class="px-6 py-4 border-b text-center">
