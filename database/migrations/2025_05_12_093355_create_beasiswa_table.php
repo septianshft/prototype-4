@@ -21,6 +21,8 @@ return new class extends Migration
             $table->enum('status', ['open', 'full'])->default('open');
             $table->foreignId('program_studi_id')->constrained('program_studi');
             $table->text('deskripsi')->nullable();
+            $table->boolean('require_file')->default(false);
+            $table->string('persyaratan_file_name')->nullable();
             $table->date('deadline_pendaftaran')->nullable();
             $table->timestamps();
         });

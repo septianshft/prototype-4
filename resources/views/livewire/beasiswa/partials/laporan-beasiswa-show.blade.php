@@ -22,17 +22,24 @@
                 <span class="text-gray-500">-</span>
             @endif
         </p>
+        <p><strong>Feedback:</strong> {{ $laporan->feedback ?? '-' }}</p>
 
         @if (Auth::user()->role === 'dosen')
             <div>
-                <label for="feedback" class="block font-semibold mb-1">Feedback:</label>
-                <textarea id="feedback" wire:model.defer="feedback" rows="4"
-                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 transition"></textarea>
+                @if ($isEditingFeedback)
+                    <textarea wire:model.defer="feedback" rows="4"
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 transition"></textarea>
 
-                <button wire:click="simpanFeedback"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition mt-2">
-                    Simpan Feedback
-                </button>
+                    <button wire:click="simpanFeedback"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition mt-2">
+                        Simpan Feedback
+                    </button>
+                @else
+                    <button wire:click="startEditingFeedback"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition mt-2">
+                        Edit Feedback
+                    </button>
+                @endif
 
                 <div class="mt-4 space-x-2">
                     @if ($laporan->acc_count < 6 && $laporan->status_acc !== 'rejected')
@@ -86,8 +93,6 @@
                     Kembali
                 </button>
             </div>
-        @else
-            <p><strong>Feedback:</strong> {{ $laporan->feedback ?? '-' }}</p>
         @endif
     </div>
 

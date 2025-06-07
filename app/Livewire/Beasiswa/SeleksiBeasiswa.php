@@ -141,6 +141,14 @@ class SeleksiBeasiswa extends Component
 
             $pendaftar = $query->paginate(10);
 
+            foreach ($pendaftar as $item) {
+                if ($item->status === 'pending' && ApplyBeasiswa::find($item->apply_id)->file_status === 'ditolak') {
+                    $item->display_status = 'syarat ditolak';
+                } else {
+                    $item->display_status = $item->status;
+                }
+            }
+
             return view('livewire.beasiswa.seleksi-beasiswa', [
                 'pendaftar' => $pendaftar,
                 'role' => $user->role,
@@ -186,9 +194,11 @@ class SeleksiBeasiswa extends Component
         $pendaftar = $query->paginate(10);
 
         foreach ($pendaftar as $item) {
-            $item->hasAccepted = ApplyBeasiswa::where('user_id', $item->user_id)
-                ->where('status', 'diterima')
-                ->exists();
+            if ($item->status === 'pending' && ApplyBeasiswa::find($item->apply_id)->file_status === 'ditolak') {
+                $item->display_status = 'syarat ditolak';
+            } else {
+                $item->display_status = $item->status;
+            }
         }
 
         return view('livewire.beasiswa.seleksi-beasiswa', [

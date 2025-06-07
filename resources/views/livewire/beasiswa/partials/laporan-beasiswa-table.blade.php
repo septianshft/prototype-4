@@ -1,91 +1,66 @@
 <div class="p-6 bg-white rounded shadow-md overflow-x-auto">
-    <table class="w-full text-sm text-left border border-gray-300">
-        <thead class="bg-gray-200 text-gray-700">
-            <tr>
-                <th class="px-6 py-4 border-b">Nama Laporan</th>
-                <th class="px-6 py-4 border-b">Nama Mahasiswa</th>
-                <th class="px-6 py-4 border-b">File</th>
-                <th class="px-6 py-4 border-b">Tanggal</th>
-                <th class="px-6 py-4 border-b">Status Laporan</th>
-                @if (in_array(auth()->user()->role, ['mahasiswa', 'admin', 'dosen', 'vice_director']))
-                    <th class="px-6 py-4 border-b text-center">Aksi</th>
-                @endif
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($laporans as $laporan)
-                <tr class="hover:bg-gray-50 transition-all">
-                    <td class="px-6 py-4 border-b text-gray-800">{{ $laporan->nama_laporan }}</td>
-                    <td class="px-6 py-4 border-b text-gray-800">{{ $laporan->user->name ?? '-' }}</td>
-                    <td class="px-6 py-4 border-b">
-                        @if ($laporan->file_path)
-                            <a href="{{ Storage::url($laporan->file_path) }}" target="_blank"
-                                class="text-blue-600 underline hover:text-blue-800 transition">Lihat File</a>
-                        @else
-                            <span class="text-gray-500">-</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 border-b text-gray-800">
-                        {{ $laporan->created_at->format('d M Y') }}
-                    </td>
-                    <td
-                        class="px-6 py-4 border-b text-gray-800 text-center font-semibold
-                @if ($laporan->status_acc === 'approved') @elseif($laporan->status_acc === 'rejected')
-                @else @endif
-            ">
-                        @if ($laporan->status_acc === 'approved')
-                            Disetujui
-                        @elseif($laporan->status_acc === 'rejected')
-                            Ditolak
-                        @else
-                            Pending
-                        @endif
-                    </td>
 
-                    {{-- Aksi --}}
-                    @if (auth()->user()->role === 'mahasiswa')
-                        <td class="px-6 py-4 border-b text-center">
-                            <div class="flex justify-center items-center flex-nowrap gap-2">
-                                <a href="{{ route('laporan.beasiswa.show', $laporan->id) }}"
-                                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition text-sm">
-                                    Detail
-                                </a>
-                                <button wire:click="emitEditLaporan({{ $laporan->id }})"
-                                    class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded transition text-sm">
-                                    Edit
-                                </button>
-                                <button wire:click="confirmDelete({{ $laporan->id }})"
-                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition text-sm">
-                                    🗑️
-                                </button>
-                            </div>
-                        </td>
-                    @elseif(in_array(auth()->user()->role, ['admin', 'dosen', 'vice_director']))
-                        <td class="px-6 py-4 border-b text-center">
-                            <a href="{{ route('laporan.beasiswa.show', $laporan->id) }}"
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded inline-flex items-center justify-center transition"
-                                title="Lihat Detail">Detail</a>
-                        </td>
-                    @endif
-                </tr>
-            @empty
+    {{-- STEP 1: Tabel Mahasiswa (untuk dosen) --}}
+    @if (auth()->user()->role === 'dosen' && is_null($selectedMahasiswaId))
+
+        <table class="w-full text-sm text-left border border-gray-300">
+            <thead class="bg-gray-200 text-gray-700">
                 <tr>
-                    <td colspan="8" class="text-center py-4 text-sm text-gray-500">
-                        Tidak ada data laporan.
-                    </td>
+                    <th class="px-6 py-4 border-b">Nama Mahasiswa</th>
+                    <th class="px-6 py-4 border-b">NIM</th>
+                    <th class="px-6 py-4 border-b">Program Studi</th>
+                    <th class="px-6 py-4 border-b text-center">Aksi</th>
                 </tr>
-            @endforelse
-        </tbody>
+            </thead>
+            <tbody>
+                @forelse ($mahasiswas as $mhs)
+                    <tr class="hover:bg-gray-50 transition-all">
+                        <td class="px-6 py-4 border-b text-gray-800">{{ $mhs->nama_mahasiswa }}</td>
+                        <td class="px-6 py-4 border-b text-gray-800">{{ $mhs->nim }}</td>
+                        <td class="px-6 py-4 border-b text-gray-800">
+                            {{ $mhs->program_studi }} ({{ $mhs->jenjang }})
+                        </td>
+                        <td class="px-6 py-4 border-b text-center">
+                            <button wire:click="selectMahasiswa({{ $mhs->user_id }})"
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition text-sm">
+                                Lihat Laporan
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-sm text-gray-500">
+                            Tidak ada mahasiswa penerima beasiswa.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
 
-    </table>
+        {{-- STEP 2: Tabel Laporan Mahasiswa Terpilih (untuk dosen) --}}
+    @elseif (auth()->user()->role === 'dosen' && $selectedMahasiswaId)
+        <h2 class="text-xl font-semibold mb-4">
+            Laporan Mahasiswa
+        </h2>
 
-    {{-- Pagination --}}
-    @if ($laporans instanceof \Illuminate\Pagination\LengthAwarePaginator)
-        <div class="mt-4">
-            {{ $laporans->links() }}
+        {{-- Table laporan --}}
+        @include('livewire.beasiswa.partials._table-laporan', ['laporans' => $laporans])
+
+        {{-- Tombol Kembali di BAWAH --}}
+        <div class="mt-4 flex justify-end">
+            <button wire:click="$set('selectedMahasiswaId', null)"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">
+                Kembali
+            </button>
         </div>
+
+        {{-- STEP Mahasiswa: langsung tampil _table-laporan --}}
+    @elseif (auth()->user()->role === 'mahasiswa')
+        <h2 class="text-xl font-semibold mb-4">Laporan Beasiswa</h2>
+
+        {{-- Table laporan --}}
+        @include('livewire.beasiswa.partials._table-laporan', ['laporans' => $laporans])
+
     @endif
 
-    {{-- Modal Konfirmasi --}}
-    <livewire:beasiswa.partials.confirmation-modal />
 </div>

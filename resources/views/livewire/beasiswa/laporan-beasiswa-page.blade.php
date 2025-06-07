@@ -7,5 +7,6 @@
     @endif
 
     <livewire:beasiswa.partials.laporan-beasiswa-table />
+    
 
 </div>

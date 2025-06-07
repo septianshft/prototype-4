@@ -32,17 +32,22 @@ class MahasiswaDashboard extends Component
             ->where('ab.status', 'diterima')
             ->select(
                 'b.nama_beasiswa',
+                'b.require_file',
+                'b.persyaratan_file_name',
                 'dsn.name as nama_dosen',
                 DB::raw("'diterima' as status"),
                 'ab.id as apply_id'
             )
             ->first();
 
+
         $this->mahasiswa = (object) array_merge(
             (array) $mahasiswaBase,
             (array) ($beasiswaDiterima ?? [
                 'status' => null,
                 'nama_beasiswa' => null,
+                'require_file' => null,
+                'persyaratan_file_name' => null,
                 'nama_dosen' => null,
                 'apply_id' => null,
             ])

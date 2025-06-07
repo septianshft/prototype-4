@@ -45,13 +45,27 @@
 
                     {{-- Kolom Kanan --}}
                     <div class="space-y-4">
+
+                        {{-- Status Beasiswa --}}
                         <div>
                             <p class="text-sm text-gray-500">Status Beasiswa</p>
                             <p class="text-2xl font-bold mb-2">
                                 {{ $mahasiswa->status ? ucfirst($mahasiswa->status) : 'Belum diterima' }}
                             </p>
                         </div>
+
+                        {{-- Persyaratan Beasiswa (jika diterima dan require_file == 1) --}}
+                        @if ($mahasiswa->status === 'diterima' && $mahasiswa->require_file)
+                            <div>
+                                <p class="text-sm text-gray-500">Persyaratan Beasiswa</p>
+                                <p class="text-lg text-gray-800 font-semibold">
+                                    {{ $mahasiswa->persyaratan_file_name ?? '-' }}
+                                </p>
+                            </div>
+                        @endif
+
                     </div>
+
 
                 </div>
             </div>

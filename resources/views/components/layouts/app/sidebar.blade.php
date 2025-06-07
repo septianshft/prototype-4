@@ -15,30 +15,38 @@
         </a>
 
         <flux:navlist variant="outline">
-            <flux:navlist.group :heading="__('Platform')" class="grid">
-                <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item> 
+    <flux:navlist.group :heading="__('Platform')">
+        <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="mb-3">
+            {{ __('Dashboard') }}
+        </flux:navlist.item>
 
-                <flux:navlist.item icon="document-text" :href="route('beasiswa')" :current="request()->routeIs('beasiswa')" wire:navigate>{{ __('Manajemen Beasiswa') }}</flux:navlist.item>
-                
-                <flux:navlist.item icon="document-text" :href="route('laporan_beasiswa')" :current="request()->routeIs('laporan_beasiswa')" wire:navigate> {{ __('Laporan Beasiswa') }}</flux:navlist.item>
-                 
-                <flux:navlist.item icon="document-text" :href="route('seleksi.beasiswa')" :current="request()->routeIs('seleksi.beasiswa')" wire:navigate>{{ __('Seleksi Beasiswa') }}</flux:navlist.item>
+        <flux:navlist.item icon="document-text" :href="route('beasiswa')" :current="request()->routeIs('beasiswa')" wire:navigate class="mb-3">
+            {{ __('Manajemen Beasiswa') }}
+        </flux:navlist.item>
 
-                @if(auth()->check() && auth()->user()->role === 'admin')
-                    <flux:navlist.item icon="users" :href="route('mahasiswa.manajemen')" :current="request()->routeIs('mahasiswa.manajemen')" wire:navigate>
-                        {{ __('Manajemen Mahasiswa') }}
-                    </flux:navlist.item>
-                @endif
+        <flux:navlist.item icon="document-text" :href="route('seleksi.beasiswa')" :current="request()->routeIs('seleksi.beasiswa')" wire:navigate class="mb-3">
+            {{ __('Seleksi Beasiswa') }}
+        </flux:navlist.item>
 
-                @if(auth()->check() && auth()->user()->role === 'admin')
-                    <flux:navlist.item icon="users" :href="route('admin.user-manager')" :current="request()->routeIs('admin.user-manager')" wire:navigate>
-                        {{ __('User Manager') }}
-                    </flux:navlist.item>
-                @endif
-                
+        <flux:navlist.item icon="document-text" :href="route('laporan_beasiswa')" :current="request()->routeIs('laporan_beasiswa')" wire:navigate class="mb-3">
+            {{ __('Laporan Beasiswa') }}
+        </flux:navlist.item>
 
-            </flux:navlist.group>
-        </flux:navlist>
+        @if(auth()->check() && auth()->user()->role === 'admin')
+            <flux:navlist.item icon="users" :href="route('mahasiswa.manajemen')" :current="request()->routeIs('mahasiswa.manajemen')" wire:navigate class="mb-3">
+                {{ __('Manajemen Mahasiswa') }}
+            </flux:navlist.item>
+        @endif
+
+        @if(auth()->check() && auth()->user()->role === 'admin')
+            <flux:navlist.item icon="users" :href="route('admin.user-manager')" :current="request()->routeIs('admin.user-manager')" wire:navigate class="mb-3">
+                {{ __('User Manager') }}
+            </flux:navlist.item>
+        @endif
+    </flux:navlist.group>
+</flux:navlist>
+
+
 
         <flux:spacer />
 

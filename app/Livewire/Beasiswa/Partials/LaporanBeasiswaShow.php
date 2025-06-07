@@ -10,15 +10,14 @@ class LaporanBeasiswaShow extends Component
 {
     public $laporan;
     public $feedback;
+    public $isEditingFeedback = false; // for edit feedback toggle
 
     public function mount($id)
     {
-        $laporan = Laporan_Beasiswa::with(['user.dataMahasiswa', 'beasiswa'])->findOrFail($id);
         $laporan = Laporan_Beasiswa::with([
-            'user.dataMahasiswa.programStudi', // tambah relasi ke program_studi
+            'user.dataMahasiswa.programStudi',
             'beasiswa'
         ])->findOrFail($id);
-
 
         if (Auth::user()->role === 'mahasiswa' && $laporan->user_id !== Auth::id()) {
             abort(403, 'Anda tidak diizinkan melihat laporan ini.');
@@ -26,6 +25,11 @@ class LaporanBeasiswaShow extends Component
 
         $this->laporan = $laporan;
         $this->feedback = $laporan->feedback;
+    }
+
+    public function startEditingFeedback()
+    {
+        $this->isEditingFeedback = true;
     }
 
     public function simpanFeedback()
@@ -38,6 +42,8 @@ class LaporanBeasiswaShow extends Component
         $this->laporan->save();
 
         session()->flash('message', 'Feedback berhasil disimpan.');
+
+        $this->isEditingFeedback = false; // selesai edit
     }
 
     public function accLaporan($status)
@@ -90,13 +96,14 @@ class LaporanBeasiswaShow extends Component
             session()->flash('message', 'Laporan ditolak.');
         }
 
-        $this->dispatch('laporanUpdated'); // gunakan emit bukan dispatchBrowserEvent
+        $this->dispatch('laporanUpdated');
     }
 
     public function batal()
     {
         $this->dispatch('navigate-back');
     }
+
 
     public function render()
     {

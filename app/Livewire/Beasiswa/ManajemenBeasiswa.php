@@ -9,10 +9,11 @@ use App\Models\ApplyBeasiswa;
 use App\Models\Data_Mahasiswa;
 use App\Models\ProgramStudi;
 use Illuminate\Support\Facades\Auth;
+use Livewire\WithFileUploads;
 
 class ManajemenBeasiswa extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     public $search = '';
     public $selectedBeasiswa = null;  // untuk detail apply
@@ -23,7 +24,12 @@ class ManajemenBeasiswa extends Component
     public $deadline_pendaftaran;
     public $program_studi_id;
     public $programStudis = [];
-
+    public $require_file = 0;
+    public $persyaratan_file_name = '';
+    public $showApplyModal = false;
+    public $applyFile;
+    public $showApplyDetailModal = false;
+    public $applyDetail = null;
 
     // Form fields (contoh untuk create/update)
     public $beasiswaId;
@@ -41,7 +47,19 @@ class ManajemenBeasiswa extends Component
         'deskripsi' => 'nullable|string',
         'deadline_pendaftaran' => 'required|date',
         'program_studi_id' => 'required|exists:program_studi,id',
+        'require_file' => 'required|boolean',
+        'persyaratan_file_name' => 'required_if:require_file,1|string|max:255',
     ];
+
+    public function updatedRequireFile($value)
+    {
+        $this->require_file = (int) $value;
+
+        // Optional: reset nama file kalau tidak perlu upload
+        if ($this->require_file === 0) {
+            $this->persyaratan_file_name = '';
+        }
+    }
 
 
     public function mount()
@@ -94,6 +112,9 @@ class ManajemenBeasiswa extends Component
         $this->deskripsi = $beasiswa->deskripsi;
         $this->deadline_pendaftaran = $beasiswa->deadline_pendaftaran ? $beasiswa->deadline_pendaftaran->format('Y-m-d') : null;
         $this->program_studi_id = $beasiswa->program_studi_id;
+        $this->require_file = $beasiswa->require_file;
+        $this->persyaratan_file_name = $beasiswa->persyaratan_file_name;
+
 
         $this->isEdit = true;
         $this->showModal = true;
@@ -114,6 +135,22 @@ class ManajemenBeasiswa extends Component
         $this->showModal = false;
     }
 
+    public function showApplyDetail($beasiswaId)
+    {
+        $apply = ApplyBeasiswa::where('user_id', Auth::id())
+            ->where('beasiswa_id', $beasiswaId)
+            ->first();
+
+        if (!$apply) {
+            session()->flash('error', 'Belum ada pengajuan untuk beasiswa ini.');
+            return;
+        }
+
+        $this->applyDetail = $apply;
+        $this->showApplyDetailModal = true;
+    }
+
+
 
     public function update()
     {
@@ -128,6 +165,8 @@ class ManajemenBeasiswa extends Component
             'deskripsi' => $this->deskripsi,
             'deadline_pendaftaran' => $this->deadline_pendaftaran,
             'program_studi_id' => $this->program_studi_id,
+            'require_file' => $this->require_file,
+            'persyaratan_file_name' => $this->persyaratan_file_name,
         ]);
 
         $this->resetForm();
@@ -166,7 +205,59 @@ class ManajemenBeasiswa extends Component
         $this->deskripsi = '';
         $this->deadline_pendaftaran = null;
         $this->program_studi_id = null;
+        $this->require_file = 0;
+        $this->persyaratan_file_name = '';
     }
+
+    public function resetApplyModal()
+    {
+        $this->showApplyModal = false;
+        $this->selectedBeasiswa = null;
+        $this->applyFile = null;
+    }
+
+    public function submitApply()
+    {
+        // Cek lagi biar aman
+        $exists = \App\Models\ApplyBeasiswa::where('user_id', Auth::id())
+            ->where('beasiswa_id', $this->selectedBeasiswa->id)
+            ->where(function ($q) {
+                $q->where('status', 'pending')
+                    ->orWhere('status', 'diterima');
+            })
+            ->where('file_status', '!=', 'ditolak')
+            ->exists();
+
+        if ($exists) {
+            session()->flash('error', 'Kamu sudah mengajukan beasiswa ini sebelumnya.');
+            $this->resetApplyModal();
+            return;
+        }
+
+        // Jika require file, wajib isi applyFile
+        if ($this->selectedBeasiswa->require_file && !$this->applyFile) {
+            session()->flash('error', 'Harap upload file persyaratan.');
+            return;
+        }
+
+        // Simpan Apply
+        $apply = new \App\Models\ApplyBeasiswa();
+        $apply->user_id = Auth::id();
+        $apply->beasiswa_id = $this->selectedBeasiswa->id;
+        $apply->status = 'pending';
+
+        // Simpan file jika ada
+        if ($this->selectedBeasiswa->require_file && $this->applyFile) {
+            $path = $this->applyFile->store('uploads/persyaratan', 'public');
+            $apply->file_persyaratan_path = $path;
+        }
+
+        $apply->save();
+
+        session()->flash('success', 'Berhasil mengajukan beasiswa.');
+        $this->resetApplyModal();
+    }
+
 
 
     public function apply($beasiswaId)
@@ -193,39 +284,34 @@ class ManajemenBeasiswa extends Component
             return;
         }
 
-        $mahasiswaPS = $mahasiswa->programStudi;  
-        $beasiswaPS = $beasiswa->programStudi;    
+        $mahasiswaPS = $mahasiswa->programStudi;
+        $beasiswaPS = $beasiswa->programStudi;
 
         if (!$mahasiswaPS || !$beasiswaPS) {
             session()->flash('error', 'Program studi tidak ditemukan.');
             return;
         }
 
-        if ($mahasiswaPS->id !== $beasiswaPS->id) {
-            if ($mahasiswaPS->jenjang === $beasiswaPS->jenjang) {
-                session()->flash('error', 'Program studi Anda tidak cocok dengan beasiswa ini.');
-                return;
-            }
-        }
-
-        if ($mahasiswaPS->id === $beasiswaPS->id && $mahasiswaPS->jenjang !== $beasiswaPS->jenjang) {
-            session()->flash('error', 'Jenjang program studi Anda tidak cocok dengan beasiswa ini.');
+        if ($mahasiswaPS->id !== $beasiswaPS->id || $mahasiswaPS->jenjang !== $beasiswaPS->jenjang) {
+            session()->flash('error', 'Program studi atau jenjang Anda tidak cocok dengan beasiswa ini.');
             return;
         }
 
-        if ($mahasiswa->status_seleksi === 'diterima') {
-            session()->flash('error', 'Kamu sudah diterima beasiswa, tidak bisa apply lagi.');
-            return;
-        }
-
+        // BENAR:
         $exists = ApplyBeasiswa::where('user_id', Auth::id())
             ->where('beasiswa_id', $beasiswaId)
+            ->where(function ($q) {
+                $q->where('status', 'pending')
+                    ->orWhere('status', 'diterima');
+            })
+            ->where('file_status', '!=', 'ditolak')
             ->exists();
 
         if ($exists) {
             session()->flash('error', 'Kamu sudah mengajukan beasiswa ini sebelumnya.');
             return;
         }
+
 
         $jumlahDiterima = ApplyBeasiswa::where('beasiswa_id', $beasiswaId)
             ->where('status', 'diterima')
@@ -236,16 +322,18 @@ class ManajemenBeasiswa extends Component
             return;
         }
 
-        ApplyBeasiswa::create([
-            'user_id' => Auth::id(),
-            'beasiswa_id' => $beasiswaId,
-            'status' => 'pending',
-        ]);
+        // Jika semua valid, simpan selectedBeasiswa & buka modal
+        $this->selectedBeasiswa = $beasiswa;
 
-        session()->flash('success', 'Berhasil mengajukan beasiswa, tunggu persetujuan.');
+        if ($this->selectedBeasiswa->require_file) {
+            // Kalau butuh upload, tampilkan modal upload
+            $this->showApplyModal = true;
+            $this->applyFile = null;
+        } else {
+            // Tidak perlu upload, langsung apply
+            $this->submitApply();
+        }
     }
-
-
 
 
     public function pilih()
@@ -258,6 +346,11 @@ class ManajemenBeasiswa extends Component
         // Cek apakah sudah apply sebelumnya
         $exists = ApplyBeasiswa::where('user_id', Auth::id())
             ->where('beasiswa_id', $this->selectedBeasiswa->id)
+            ->where(function ($q) {
+                $q->where('status', 'pending')
+                    ->orWhere('status', 'diterima');
+            })
+            ->where('file_status', '!=', 'ditolak')
             ->exists();
 
         if ($exists) {
@@ -301,6 +394,9 @@ class ManajemenBeasiswa extends Component
             'deadline_pendaftaran' => $this->deadline_pendaftaran,
             'dosen_id' => $dosenId,
             'program_studi_id' => $this->program_studi_id,
+            'require_file' => $this->require_file,
+            'persyaratan_file_name' => $this->persyaratan_file_name,
+
         ]);
 
 

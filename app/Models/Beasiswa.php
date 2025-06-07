@@ -8,7 +8,18 @@ class Beasiswa extends Model
 {
    protected $connection = 'mysql_crud'; // arahkan ke MySQL
    protected $table = 'beasiswa';
-   protected $fillable = ['nama_beasiswa', 'nama_penyelenggara', 'periode', 'kuota', 'deskripsi', 'dosen_id', 'deadline_pendaftaran', 'program_studi_id'];
+   protected $fillable = [
+      'nama_beasiswa',
+      'nama_penyelenggara',
+      'periode',
+      'kuota',
+      'deskripsi',
+      'dosen_id',
+      'deadline_pendaftaran',
+      'program_studi_id',
+      'require_file',
+      'persyaratan_file_name'
+   ];
 
    protected $casts = [
       'deadline_pendaftaran' => 'datetime',

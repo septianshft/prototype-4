@@ -16,8 +16,11 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('beasiswa_id')->constrained('beasiswa')->onDelete('cascade');
             $table->string('status')->nullable();
+            $table->string('file_persyaratan_path')->nullable();
+            $table->string('feedback')->nullable();
+            $table->enum('file_status', ['pending', 'diterima', 'ditolak'])->default('pending');
             $table->timestamps();
-        });
+    });
     }
 
     public function down()

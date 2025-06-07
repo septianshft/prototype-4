@@ -25,7 +25,7 @@ class ApplyBeasiswaPage extends Component
 
             if ($apply) {
                 $laporan->setRelation('beasiswa', $apply->beasiswa);
-                $laporan->beasiswa_id = $apply->beasiswa_id; 
+                $laporan->beasiswa_id = $apply->beasiswa_id;
             }
         }
 

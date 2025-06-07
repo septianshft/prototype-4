@@ -15,6 +15,9 @@ class ApplyBeasiswa extends Model
         'user_id',
         'beasiswa_id',
         'status',
+        'file_persyaratan_path',
+        'feedback',
+        'file_status',
     ];
 
     /**

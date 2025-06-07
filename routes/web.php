@@ -89,4 +89,7 @@ Route::get('/roledashboard', Roledashboard::class)
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/beasiswa/{beasiswa}/detail', ManajemenBeasiswaDetail::class)->name('beasiswa.detail');
+
+Route::get('/beasiswa/seleksi/detail/{apply}', \App\Livewire\Beasiswa\SeleksiBeasiswaDetail::class)
+    ->name('seleksi.beasiswa.detail');
 });
