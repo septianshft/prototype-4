@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Beasiswa;
 use App\Models\ApplyBeasiswa;
 use App\Models\Laporan_Beasiswa;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ManajemenBeasiswaDetail extends Component
@@ -66,7 +67,17 @@ class ManajemenBeasiswaDetail extends Component
             'data_mahasiswa.nim',
             'program_studi.program_studi',
             'program_studi.jenjang',
-            'apply_beasiswa.user_id'
+            'apply_beasiswa.user_id',
+
+            // Ambil jenis_laporan terakhir per mahasiswa
+            DB::raw('(
+                SELECT jenis_laporan
+                FROM laporan_beasiswa
+                WHERE laporan_beasiswa.user_id = apply_beasiswa.user_id
+                AND laporan_beasiswa.beasiswa_id = apply_beasiswa.beasiswa_id
+                ORDER BY created_at DESC
+                LIMIT 1
+            ) as latest_jenis_laporan')
         )
             ->join('data_mahasiswa', 'data_mahasiswa.user_id', '=', 'apply_beasiswa.user_id')
             ->join('program_studi', 'program_studi.id', '=', 'data_mahasiswa.program_studi_id')
@@ -74,8 +85,6 @@ class ManajemenBeasiswaDetail extends Component
             ->where('apply_beasiswa.status', 'diterima')
             ->get();
     }
-
-
 
     public function closeLaporanModal()
     {

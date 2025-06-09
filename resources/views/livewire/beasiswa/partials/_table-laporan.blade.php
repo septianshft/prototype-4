@@ -6,18 +6,16 @@
                 <th class="px-6 py-4 border-b">File</th>
                 <th class="px-6 py-4 border-b">Tanggal</th>
                 <th class="px-6 py-4 border-b">Status Laporan</th>
-                @if (in_array(auth()->user()->role, ['mahasiswa', 'admin', 'dosen', 'vice_director']))
-                    <th class="px-6 py-4 border-b text-center">Aksi</th>
-                @endif
+                <th class="px-6 py-4 border-b text-center">Aksi</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($laporans as $laporan)
                 <tr class="hover:bg-gray-50 transition-all">
+                    {{-- Nama Laporan --}}
                     <td class="px-6 py-4 border-b text-gray-800">{{ $laporan->nama_laporan }}</td>
-                    </td>
 
-
+                    {{-- File --}}
                     <td class="px-6 py-4 border-b">
                         @if ($laporan->file_path)
                             <a href="{{ Storage::url($laporan->file_path) }}" target="_blank"
@@ -26,17 +24,17 @@
                             <span class="text-gray-500">-</span>
                         @endif
                     </td>
+
+                    {{-- Tanggal --}}
                     <td class="px-6 py-4 border-b text-gray-800">
                         {{ $laporan->created_at->format('d M Y') }}
                     </td>
-                    <td
-                        class="px-6 py-4 border-b text-gray-800 text-center font-semibold
-                @if ($laporan->status_acc === 'approved') @elseif($laporan->status_acc === 'rejected')
-                @else @endif
-            ">
+
+                    {{-- Status Laporan --}}
+                    <td class="px-6 py-4 border-b text-gray-800 text-center font-semibold">
                         @if ($laporan->status_acc === 'approved')
                             Disetujui
-                        @elseif($laporan->status_acc === 'rejected')
+                        @elseif ($laporan->status_acc === 'rejected')
                             Ditolak
                         @else
                             Pending
@@ -44,13 +42,16 @@
                     </td>
 
                     {{-- Aksi --}}
-                    @if (auth()->user()->role === 'mahasiswa')
-                        <td class="px-6 py-4 border-b text-center">
+                    <td class="px-6 py-4 border-b text-center">
+                        @if (auth()->user()->role === 'mahasiswa')
                             <div class="flex justify-center items-center flex-nowrap gap-2">
+                                {{-- Detail --}}
                                 <a href="{{ route('laporan.beasiswa.show', $laporan->id) }}"
                                     class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition text-sm">
                                     Detail
                                 </a>
+
+                                {{-- Edit --}}
                                 <button wire:click="emitEditLaporan({{ $laporan->id }})"
                                     class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded transition text-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -59,6 +60,8 @@
                                             d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                     </svg>
                                 </button>
+
+                                {{-- Delete --}}
                                 <button wire:click="confirmDelete({{ $laporan->id }})"
                                     class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition text-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -68,24 +71,24 @@
                                     </svg>
                                 </button>
                             </div>
-                        </td>
-                    @elseif(in_array(auth()->user()->role, ['admin', 'dosen', 'vice_director']))
-                        <td class="px-6 py-4 border-b text-center">
+                        @elseif (in_array(auth()->user()->role, ['admin', 'dosen', 'vice_director']))
+                            {{-- ADMIN / DOSEN / VICE DIRECTOR hanya bisa Lihat Detail --}}
                             <a href="{{ route('laporan.beasiswa.show', $laporan->id) }}"
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded inline-flex items-center justify-center transition"
-                                title="Lihat Detail">Detail</a>
-                        </td>
-                    @endif
+                                title="Lihat Detail">
+                                Detail
+                            </a>
+                        @endif
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="text-center py-4 text-sm text-gray-500">
+                    <td colspan="5" class="text-center py-4 text-sm text-gray-500">
                         Tidak ada data laporan.
                     </td>
                 </tr>
             @endforelse
         </tbody>
-
     </table>
 
     {{-- Pagination --}}

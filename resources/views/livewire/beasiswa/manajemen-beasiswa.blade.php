@@ -57,8 +57,8 @@
                         @endphp
 
                         <div
-                            class="flex justify-between items-center p-4 border rounded-lg shadow bg-white
-                    {{ !$canApply && !$isAdminOrDosen ? 'opacity-50 pointer-events-none bg-gray-100' : '' }}">
+                            class="flex flex-col p-4 border rounded-lg shadow bg-white h-full
+                            {{ !$canApply && !$isAdminOrDosen ? 'opacity-50 pointer-events-none bg-gray-100' : '' }}">
 
                             <div class="flex-grow">
                                 <h3 class="text-lg font-semibold text-gray-800">{{ $beasiswa->nama_beasiswa }}</h3>
@@ -92,7 +92,7 @@
                             </div>
 
 
-                            <div class="ml-4 flex-shrink-0 flex flex-col space-y-2 text-right">
+                            <div class="mt-4 flex flex-col space-y-2 text-right">
                                 @if ($isAdminOrDosen)
                                     <button wire:click="edit({{ $beasiswa->id }})"
                                         class="flex items-center justify-center px-2 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">

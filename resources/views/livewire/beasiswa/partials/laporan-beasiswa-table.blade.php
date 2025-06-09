@@ -1,7 +1,9 @@
 <div class="p-6 bg-white rounded shadow-md overflow-x-auto">
 
-    {{-- STEP 1: Tabel Mahasiswa (untuk dosen) --}}
-    @if (auth()->user()->role === 'dosen' && is_null($selectedMahasiswaId))
+    {{-- STEP 1: Tabel Mahasiswa (untuk dosen & admin) --}}
+    @if ((auth()->user()->role === 'dosen' || auth()->user()->role === 'admin') && is_null($selectedMahasiswaId))
+
+        <h2 class="text-xl font-semibold mb-4">Daftar Mahasiswa Penerima Beasiswa</h2>
 
         <table class="w-full text-sm text-left border border-gray-300">
             <thead class="bg-gray-200 text-gray-700">
@@ -37,14 +39,14 @@
             </tbody>
         </table>
 
-        {{-- STEP 2: Tabel Laporan Mahasiswa Terpilih (untuk dosen) --}}
-    @elseif (auth()->user()->role === 'dosen' && $selectedMahasiswaId)
+        {{-- STEP 2: Tabel Laporan Mahasiswa Terpilih (untuk dosen & admin) --}}
+    @elseif ((auth()->user()->role === 'dosen' || auth()->user()->role === 'admin') && $selectedMahasiswaId)
         <h2 class="text-xl font-semibold mb-4">
             Laporan Mahasiswa
         </h2>
 
         {{-- Table laporan --}}
-        @include('livewire.beasiswa.partials._table-laporan', ['laporans' => $laporans])
+        @include('livewire.beasiswa.partials._table-laporan', ['laporans' => $laporans ?? []])
 
         {{-- Tombol Kembali di BAWAH --}}
         <div class="mt-4 flex justify-end">
@@ -59,7 +61,7 @@
         <h2 class="text-xl font-semibold mb-4">Laporan Beasiswa</h2>
 
         {{-- Table laporan --}}
-        @include('livewire.beasiswa.partials._table-laporan', ['laporans' => $laporans])
+        @include('livewire.beasiswa.partials._table-laporan', ['laporans' => $laporans ?? []])
 
     @endif
 

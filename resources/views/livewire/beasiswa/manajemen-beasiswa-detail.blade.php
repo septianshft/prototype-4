@@ -8,7 +8,8 @@
                     <th class="px-6 py-4 border-b">Nama Mahasiswa</th>
                     <th class="px-6 py-4 border-b">NIM</th>
                     <th class="px-6 py-4 border-b">Program Studi</th>
-                    <th class="px-6 py-4 border-b">Progress</th>
+                    <th class="px-6 py-4 border-b">Laporan Status</th>
+                    <th class="px-6 py-4 border-b">Detail</th>
                 </tr>
             </thead>
             <tbody>
@@ -18,6 +19,13 @@
                         <td class="px-6 py-4 border-b">{{ $apply->nim }}</td>
                         <td class="px-6 py-4 border-b">
                             {{ $apply->program_studi ?? '-' }} ({{ $apply->jenjang ?? '-' }})
+                        </td>
+                        <td class="px-6 py-4 border-b">
+                            @if ($apply->latest_jenis_laporan)
+                                Laporan {{ ucfirst($apply->latest_jenis_laporan) }}
+                            @else
+                                <span class="text-gray-500 italic">Belum ada progress</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 border-b">
                             <button type="button" wire:click="showLaporan({{ $apply->user_id }})"
@@ -41,13 +49,13 @@
     {{-- Progress Laporan --}}
     @if ($laporanDetail)
 
-        <h3 class="text-2xl font-bold mb-4 text-gray-700">Progress Laporan Mahasiswa</h3>
+        {{-- <h3 class="text-2xl font-bold mb-4 text-gray-700">Progress Laporan Mahasiswa</h3> --}}
 
         <table class="w-full text-sm text-left border border-gray-300 mb-4">
             <thead class="bg-gray-200 text-gray-700">
                 <tr>
                     <th class="px-6 py-4 border-b">Nama Laporan</th>
-                    <th class="px-6 py-4 border-b">Jenis</th>
+                    <th class="px-6 py-4 border-b">Status laporan</th>
                     <th class="px-6 py-4 border-b">File</th>
                 </tr>
             </thead>
@@ -55,7 +63,7 @@
                 @forelse ($laporanDetail as $laporan)
                     <tr class="hover:bg-gray-50 transition-all">
                         <td class="px-6 py-4 border-b">{{ $laporan['nama_laporan'] }}</td>
-                        <td class="px-6 py-4 border-b capitalize">{{ $laporan['jenis_laporan'] }}</td>
+                        <td class="px-6 py-4 border-b capitalize">Laporan {{ $laporan['jenis_laporan'] }}</td>
                         <td class="px-6 py-4 border-b">
                             @if ($laporan['file_path'])
                                 <a href="{{ $laporan['file_path'] }}" target="_blank"

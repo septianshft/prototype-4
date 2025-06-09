@@ -83,7 +83,7 @@ class LaporanBeasiswaTable extends Component
     {
         $user = Auth::user();
 
-        if ($user->role === 'dosen' && is_null($this->selectedMahasiswaId)) {
+        if (($user->role === 'dosen' || $user->role === 'admin') && is_null($this->selectedMahasiswaId)) {
             // STEP 1: Tampilkan daftar mahasiswa
             $mahasiswas = DB::table('apply_beasiswa as ab')
                 ->join('data_mahasiswa as dm', 'ab.user_id', '=', 'dm.user_id')
@@ -91,7 +91,10 @@ class LaporanBeasiswaTable extends Component
                 ->whereIn('ab.beasiswa_id', function ($query) use ($user) {
                     $query->select('id')
                         ->from('beasiswa')
-                        ->where('dosen_id', $user->id);
+                        // untuk admin → ambil semua beasiswa
+                        ->when($user->role === 'dosen', function ($q) use ($user) {
+                            $q->where('dosen_id', $user->id);
+                        });
                 })
                 ->where('ab.status', 'diterima')
                 ->groupBy('ab.user_id', 'dm.nama_mahasiswa', 'dm.nim', 'ps.program_studi', 'ps.jenjang')
@@ -122,7 +125,7 @@ class LaporanBeasiswaTable extends Component
                         $query->whereNull('id');
                     }
                 })
-                ->when($user->role === 'dosen', function ($query) {
+                ->when($user->role === 'dosen' || $user->role === 'admin', function ($query) {
                     if ($this->selectedMahasiswaId) {
                         $query->where('user_id', $this->selectedMahasiswaId);
                     } else {

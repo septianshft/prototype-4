@@ -15,38 +15,49 @@
         </a>
 
         <flux:navlist variant="outline">
-    <flux:navlist.group :heading="__('Platform')">
-        <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="mb-3">
-            {{ __('Dashboard') }}
-        </flux:navlist.item>
+            <flux:navlist.group :heading="__('Platform')">
+                <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="mb-3">
+                    {{ __('Dashboard') }}
+                </flux:navlist.item>
 
-        <flux:navlist.item icon="document-text" :href="route('beasiswa')" :current="request()->routeIs('beasiswa')" wire:navigate class="mb-3">
-            {{ __('Manajemen Beasiswa') }}
-        </flux:navlist.item>
+                <flux:navlist.item icon="document-text" :href="route('beasiswa')" :current="request()->routeIs('beasiswa')" wire:navigate class="mb-3">
+                    {{ __('Manajemen Beasiswa') }}
+                </flux:navlist.item>
 
-        <flux:navlist.item icon="document-text" :href="route('seleksi.beasiswa')" :current="request()->routeIs('seleksi.beasiswa')" wire:navigate class="mb-3">
-            {{ __('Seleksi Beasiswa') }}
-        </flux:navlist.item>
+                <flux:navlist.item icon="document-text" :href="route('seleksi.beasiswa')" :current="request()->routeIs('seleksi.beasiswa')" wire:navigate class="mb-3">
+                    {{ __('Seleksi Beasiswa') }}
+                </flux:navlist.item>
 
-        <flux:navlist.item icon="document-text" :href="route('laporan_beasiswa')" :current="request()->routeIs('laporan_beasiswa')" wire:navigate class="mb-3">
-            {{ __('Laporan Beasiswa') }}
-        </flux:navlist.item>
+                {{-- Menambahkan query untuk menghitung jumlah laporan yang pending --}}
+                @php
+                    $jumlahPendingLaporan = \App\Models\Laporan_Beasiswa::where('status_acc', 'pending')->count();
+                @endphp
 
-        @if(auth()->check() && auth()->user()->role === 'admin')
-            <flux:navlist.item icon="users" :href="route('mahasiswa.manajemen')" :current="request()->routeIs('mahasiswa.manajemen')" wire:navigate class="mb-3">
-                {{ __('Manajemen Mahasiswa') }}
-            </flux:navlist.item>
-        @endif
+                <flux:navlist.item icon="document-text" :href="route('laporan_beasiswa')" :current="request()->routeIs('laporan_beasiswa')" wire:navigate class="mb-3">
+                    <span class="flex justify-between items-center w-full">
+                        <span>{{ __('Laporan Beasiswa') }}</span>
 
-        @if(auth()->check() && auth()->user()->role === 'admin')
-            <flux:navlist.item icon="users" :href="route('admin.user-manager')" :current="request()->routeIs('admin.user-manager')" wire:navigate class="mb-3">
-                {{ __('User Manager') }}
-            </flux:navlist.item>
-        @endif
-    </flux:navlist.group>
-</flux:navlist>
+                        @if ($jumlahPendingLaporan > 0)
+                            <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                                {{ $jumlahPendingLaporan }}
+                            </span>
+                        @endif
+                    </span>
+                </flux:navlist.item>
 
+                @if(auth()->check() && auth()->user()->role === 'admin')
+                    <flux:navlist.item icon="users" :href="route('mahasiswa.manajemen')" :current="request()->routeIs('mahasiswa.manajemen')" wire:navigate class="mb-3">
+                        {{ __('Manajemen Mahasiswa') }}
+                    </flux:navlist.item>
+                @endif
 
+                @if(auth()->check() && auth()->user()->role === 'admin')
+                    <flux:navlist.item icon="users" :href="route('admin.user-manager')" :current="request()->routeIs('admin.user-manager')" wire:navigate class="mb-3">
+                        {{ __('User Manager') }}
+                    </flux:navlist.item>
+                @endif
+            </flux:navlist.group>
+        </flux:navlist>
 
         <flux:spacer />
 
@@ -141,7 +152,7 @@
 
     {{ $slot }}
 
-      {{-- WAJIB UNTUK LIVEWIRE --}}
+    {{-- WAJIB UNTUK LIVEWIRE --}}
     @livewireScripts
 
     @fluxScripts

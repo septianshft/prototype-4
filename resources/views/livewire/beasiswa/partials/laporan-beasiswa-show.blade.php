@@ -22,8 +22,10 @@
                 <span class="text-gray-500">-</span>
             @endif
         </p>
+
         <p><strong>Feedback:</strong> {{ $laporan->feedback ?? '-' }}</p>
 
+        {{-- ROLE DOSEN --}}
         @if (Auth::user()->role === 'dosen')
             <div>
                 @if ($isEditingFeedback)
@@ -54,9 +56,10 @@
                         </button>
                     @endif
 
+                    {{-- Tombol kembali --}}
                     <button wire:click="batal"
                         class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition">
-                        Batal
+                        Kembali
                     </button>
                 </div>
 
@@ -70,6 +73,8 @@
                     @endif
                 </p>
             </div>
+
+            {{-- ROLE MAHASISWA --}}
         @elseif(Auth::user()->role === 'mahasiswa')
             <p><strong>Status Laporan:</strong>
                 <span @class([
@@ -89,6 +94,15 @@
 
             <div class="mt-4">
                 <button wire:click="batal"
+                    class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition">
+                    Kembali
+                </button>
+            </div>
+
+            {{-- ROLE VICE DIRECTOR & ADMIN --}}
+        @elseif (in_array(Auth::user()->role, ['vice_director', 'admin']))
+            <div class="mt-4 flex justify-end">
+                <button onclick="history.back()"
                     class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition">
                     Kembali
                 </button>
