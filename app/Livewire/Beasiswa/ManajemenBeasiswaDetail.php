@@ -18,45 +18,12 @@ class ManajemenBeasiswaDetail extends Component
     public $mahasiswas = [];
     public $hideTableMahasiswa = false;
 
-
+    // Function to load mahasiswa and their last report type
     public function mount(Beasiswa $beasiswa)
     {
         $this->beasiswaId = $beasiswa->id;
         $this->beasiswa = $beasiswa;
         $this->loadMahasiswas();
-
-
-        $this->mahasiswas = ApplyBeasiswa::select(
-            'apply_beasiswa.id AS apply_id',
-            'data_mahasiswa.nama_mahasiswa',
-            'data_mahasiswa.nim',
-            'program_studi.program_studi',
-            'program_studi.jenjang',
-            'apply_beasiswa.user_id'
-        )
-            ->join('data_mahasiswa', 'data_mahasiswa.user_id', '=', 'apply_beasiswa.user_id')
-            ->join('program_studi', 'program_studi.id', '=', 'data_mahasiswa.program_studi_id')
-            ->where('apply_beasiswa.beasiswa_id', $this->beasiswaId)
-            ->where('apply_beasiswa.status', 'diterima')
-            ->get();
-    }
-
-
-
-    public function showLaporan($userId)
-    {
-        $laporans = Laporan_Beasiswa::where('user_id', $userId)
-            ->where('beasiswa_id', $this->beasiswaId)
-            ->get();
-
-        $this->laporanDetail = $laporans->map(fn($laporan) => [
-            'nama_laporan' => $laporan->nama_laporan,
-            'jenis_laporan' => $laporan->jenis_laporan,
-            'file_path' => $laporan->file_path ? Storage::url($laporan->file_path) : null,
-        ])->toArray();
-
-        $this->hideTableMahasiswa = true;
-        // ⬅️ ketika klik, sembunyikan table mahasiswa
     }
 
     public function loadMahasiswas()
@@ -68,8 +35,7 @@ class ManajemenBeasiswaDetail extends Component
             'program_studi.program_studi',
             'program_studi.jenjang',
             'apply_beasiswa.user_id',
-
-            // Ambil jenis_laporan terakhir per mahasiswa
+            // Ambil jenis laporan terakhir
             DB::raw('(
                 SELECT jenis_laporan
                 FROM laporan_beasiswa
@@ -86,12 +52,28 @@ class ManajemenBeasiswaDetail extends Component
             ->get();
     }
 
-    public function closeLaporanModal()
+    // Show laporan for the selected student
+    public function showLaporan($userId)
     {
-        $this->showLaporanModal = false;
-        $this->laporanDetail = [];
+        $laporans = Laporan_Beasiswa::where('user_id', $userId)
+            ->where('beasiswa_id', $this->beasiswaId)
+            ->get();
+
+        // Ensure we properly map the details as an array
+        $this->laporanDetail = $laporans->map(function ($laporan) {
+            return [
+                'nama_laporan' => $laporan->nama_laporan,
+                'jenis_laporan' => $laporan->jenis_laporan,
+                'file_path' => $laporan->file_path ? Storage::url($laporan->file_path) : null,
+            ];
+        })->toArray();  // Convert the collection to an array
+
+        // After clicking the button, hide the table and show the progress
+        $this->hideTableMahasiswa = true;
     }
 
+
+    // Hide laporan detail
     public function hideLaporan()
     {
         $this->laporanDetail = null;
@@ -99,8 +81,12 @@ class ManajemenBeasiswaDetail extends Component
         $this->loadMahasiswas();
     }
 
-    public function updatedShowLaporanModal() {}
-
+    // Reset modal visibility
+    public function closeLaporanModal()
+    {
+        $this->showLaporanModal = false;
+        $this->laporanDetail = [];
+    }
 
     public function render()
     {

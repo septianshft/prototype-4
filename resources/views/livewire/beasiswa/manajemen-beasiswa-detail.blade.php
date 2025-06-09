@@ -20,13 +20,16 @@
                         <td class="px-6 py-4 border-b">
                             {{ $apply->program_studi ?? '-' }} ({{ $apply->jenjang ?? '-' }})
                         </td>
+
+                        <!-- Menampilkan status laporan berdasarkan jenis laporan terakhir -->
                         <td class="px-6 py-4 border-b">
-                            @if ($apply->latest_jenis_laporan)
-                                Laporan {{ ucfirst($apply->latest_jenis_laporan) }}
+                            @if ($apply->latest_jenis_laporan == 'final')
+                                Laporan Final
                             @else
-                                <span class="text-gray-500 italic">Belum ada progress</span>
+                                Laporan Progress
                             @endif
                         </td>
+
                         <td class="px-6 py-4 border-b">
                             <button type="button" wire:click="showLaporan({{ $apply->user_id }})"
                                 class="text-blue-600 underline hover:text-blue-800 text-sm mr-2">
@@ -37,6 +40,7 @@
                 @endforeach
             </tbody>
         </table>
+
         @if (!$laporanDetail)
             <div class="flex justify-end mt-4">
                 <a href="{{ route('beasiswa') }}" class="bg-blue-600 text-white px-4 py-2 rounded">
@@ -48,8 +52,6 @@
 
     {{-- Progress Laporan --}}
     @if ($laporanDetail)
-
-        {{-- <h3 class="text-2xl font-bold mb-4 text-gray-700">Progress Laporan Mahasiswa</h3> --}}
 
         <table class="w-full text-sm text-left border border-gray-300 mb-4">
             <thead class="bg-gray-200 text-gray-700">
@@ -89,3 +91,4 @@
             </button>
         </div>
     @endif
+</div>
