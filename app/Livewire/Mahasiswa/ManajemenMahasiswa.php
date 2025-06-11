@@ -110,7 +110,7 @@ class ManajemenMahasiswa extends Component
     {
         $this->deleteId = $id;
 
-        $this->dispatchBrowserEvent('showModal', [
+        $this->dispatch('showModal', [
             'title' => 'Hapus Data Mahasiswa',
             'message' => 'Apakah Anda yakin ingin menghapus data ini?',
             'confirmText' => 'Hapus',

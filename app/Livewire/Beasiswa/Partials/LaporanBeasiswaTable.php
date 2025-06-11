@@ -83,15 +83,16 @@ class LaporanBeasiswaTable extends Component
     {
         $user = Auth::user();
 
-        if (($user->role === 'dosen' || $user->role === 'admin') && is_null($this->selectedMahasiswaId)) {
-            // STEP 1: Tampilkan daftar mahasiswa
+        // STEP 1: Admin and Dosen Roles - Display the list of students
+        if (($user->role === 'dosen' || $user->role === 'admin' || $user->role === 'vicedirector') && is_null($this->selectedMahasiswaId)) {
+            // Retrieve list of students who are accepted
             $mahasiswas = DB::table('apply_beasiswa as ab')
                 ->join('data_mahasiswa as dm', 'ab.user_id', '=', 'dm.user_id')
                 ->leftJoin('program_studi as ps', 'dm.program_studi_id', '=', 'ps.id')
                 ->whereIn('ab.beasiswa_id', function ($query) use ($user) {
                     $query->select('id')
                         ->from('beasiswa')
-                        // untuk admin → ambil semua beasiswa
+                        // For admin or dosen
                         ->when($user->role === 'dosen', function ($q) use ($user) {
                             $q->where('dosen_id', $user->id);
                         });
@@ -110,9 +111,12 @@ class LaporanBeasiswaTable extends Component
             return view('livewire.beasiswa.partials.laporan-beasiswa-table', [
                 'mahasiswas' => $mahasiswas,
                 'laporans' => null,
+                'role' => $user->role, // Pass role to the view
             ]);
-        } else {
-            // STEP 2: Tampilkan laporan mahasiswa terpilih (atau mahasiswa/admin/vice_director)
+        }
+
+        // STEP 2: Admin, Dosen, and Vice Director - Display selected student reports
+        else {
             $laporans = Laporan_Beasiswa::query()
                 ->when($user->role === 'mahasiswa', function ($query) use ($user) {
                     $diterima = ApplyBeasiswa::where('user_id', $user->id)
@@ -125,7 +129,7 @@ class LaporanBeasiswaTable extends Component
                         $query->whereNull('id');
                     }
                 })
-                ->when($user->role === 'dosen' || $user->role === 'admin', function ($query) {
+                ->when($user->role === 'dosen' || $user->role === 'admin' || $user->role === 'vicedirector', function ($query) {
                     if ($this->selectedMahasiswaId) {
                         $query->where('user_id', $this->selectedMahasiswaId);
                     } else {
@@ -138,6 +142,7 @@ class LaporanBeasiswaTable extends Component
             return view('livewire.beasiswa.partials.laporan-beasiswa-table', [
                 'mahasiswas' => null,
                 'laporans' => $laporans,
+                'role' => $user->role, // Pass role to the view
             ]);
         }
     }

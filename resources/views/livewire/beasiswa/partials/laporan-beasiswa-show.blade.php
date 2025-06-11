@@ -100,7 +100,7 @@
             </div>
 
             {{-- ROLE VICE DIRECTOR & ADMIN --}}
-        @elseif (in_array(Auth::user()->role, ['vice_director', 'admin']))
+        @elseif (in_array(Auth::user()->role, ['vicedirector', 'admin']))
             <div class="mt-4 flex justify-end">
                 <button onclick="history.back()"
                     class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded transition">

@@ -71,7 +71,7 @@
                                     </svg>
                                 </button>
                             </div>
-                        @elseif (in_array(auth()->user()->role, ['admin', 'dosen', 'vice_director']))
+                        @elseif (in_array(auth()->user()->role, ['admin', 'dosen', 'vicedirector']))
                             {{-- ADMIN / DOSEN / VICE DIRECTOR hanya bisa Lihat Detail --}}
                             <a href="{{ route('laporan.beasiswa.show', $laporan->id) }}"
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded inline-flex items-center justify-center transition"

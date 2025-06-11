@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Beasiswa\partials;
+namespace App\Livewire\Beasiswa\Partials;
 
 use App\Models\Laporan_Beasiswa;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +29,9 @@ class LaporanBeasiswaShow extends Component
 
     public function startEditingFeedback()
     {
+        if (Auth::user()->role !== 'dosen') {
+            abort(403, 'Hanya dosen yang dapat memberikan feedback.');
+        }
         $this->isEditingFeedback = true;
     }
 
@@ -42,8 +45,7 @@ class LaporanBeasiswaShow extends Component
         $this->laporan->save();
 
         session()->flash('message', 'Feedback berhasil disimpan.');
-
-        $this->isEditingFeedback = false; // selesai edit
+        $this->isEditingFeedback = false;
     }
 
     public function accLaporan($status)
@@ -103,7 +105,6 @@ class LaporanBeasiswaShow extends Component
     {
         $this->dispatch('navigate-back');
     }
-
 
     public function render()
     {
