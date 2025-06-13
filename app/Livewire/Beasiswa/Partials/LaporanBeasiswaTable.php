@@ -83,12 +83,13 @@ class LaporanBeasiswaTable extends Component
     {
         $user = Auth::user();
 
-        // STEP 1: Admin and Dosen Roles - Display the list of students
+        // STEP 1: Admin, Dosen, and Vice Director - Display the list of students
         if (($user->role === 'dosen' || $user->role === 'admin' || $user->role === 'vicedirector') && is_null($this->selectedMahasiswaId)) {
-            // Retrieve list of students who are accepted
+            // Retrieve list of students who are accepted, along with the name of the scholarship
             $mahasiswas = DB::table('apply_beasiswa as ab')
                 ->join('data_mahasiswa as dm', 'ab.user_id', '=', 'dm.user_id')
                 ->leftJoin('program_studi as ps', 'dm.program_studi_id', '=', 'ps.id')
+                ->leftJoin('beasiswa as b', 'ab.beasiswa_id', '=', 'b.id') // Join with the beasiswa table to get the scholarship name
                 ->whereIn('ab.beasiswa_id', function ($query) use ($user) {
                     $query->select('id')
                         ->from('beasiswa')
@@ -98,13 +99,14 @@ class LaporanBeasiswaTable extends Component
                         });
                 })
                 ->where('ab.status', 'diterima')
-                ->groupBy('ab.user_id', 'dm.nama_mahasiswa', 'dm.nim', 'ps.program_studi', 'ps.jenjang')
+                ->groupBy('ab.user_id', 'dm.nama_mahasiswa', 'dm.nim', 'ps.program_studi', 'ps.jenjang', 'b.nama_beasiswa') // Include 'b.nama_beasiswa'
                 ->select(
                     'ab.user_id',
                     'dm.nama_mahasiswa',
                     'dm.nim',
                     'ps.program_studi',
-                    'ps.jenjang'
+                    'ps.jenjang',
+                    'b.nama_beasiswa' // Select the scholarship name
                 )
                 ->get();
 

@@ -50,7 +50,7 @@
 
                     {{-- Aksi --}}
                     <td class="px-4 py-2 space-x-1 text-center">
-                        @if (in_array($role, ['dosen', 'admin']))
+                        @if (in_array($role, ['dosen']))
                             {{-- ACC --}}
                             <button wire:click="accept({{ $mhs->apply_id }})"
                                 class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded disabled:opacity-50"

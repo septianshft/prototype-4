@@ -13,6 +13,7 @@
                         <th class="px-6 py-4 border-b">Nama Mahasiswa</th>
                         <th class="px-6 py-4 border-b">NIM</th>
                         <th class="px-6 py-4 border-b">Program Studi</th>
+                        <th class="px-6 py-4 border-b">Nama Beasiswa</th> <!-- Add this column -->
                         <th class="px-6 py-4 border-b text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -23,6 +24,8 @@
                             <td class="px-6 py-4 border-b text-gray-800">{{ $mhs->nim }}</td>
                             <td class="px-6 py-4 border-b text-gray-800">{{ $mhs->program_studi }} ({{ $mhs->jenjang }})
                             </td>
+                            <td class="px-6 py-4 border-b text-gray-800">{{ $mhs->nama_beasiswa }}</td>
+                            <!-- Display Nama Beasiswa -->
                             <td class="px-6 py-4 border-b text-center">
                                 <button wire:click="selectMahasiswa({{ $mhs->user_id }})"
                                     class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition text-sm">
@@ -32,7 +35,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center py-4 text-sm text-gray-500">Tidak ada mahasiswa
+                            <td colspan="5" class="text-center py-4 text-sm text-gray-500">Tidak ada mahasiswa
                                 penerima beasiswa.</td>
                         </tr>
                     @endforelse
